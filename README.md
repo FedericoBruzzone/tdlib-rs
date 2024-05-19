@@ -1,10 +1,25 @@
 # tdlib-rs
 
-This is an improved version of the [tdlib-rs](https://github.com/paper-plane-developers/tdlib-rs) library that not required `pkg-config` as a dependency and has a more flexible way to build the library.
-
 A Rust wrapper around the Telegram Database library. It includes a generator to automatically generate the types and functions from the TDLib's [Type Language](https://core.telegram.org/mtproto/TL) file.
 
-It's mainly created for using it in the [Telegrand](https://github.com/melix99/telegrand) client, but it should work also for any other Rust project.
+## Why this fork?
+
+This is an improved version of the [tdlib-rs](https://github.com/paper-plane-developers/tdlib-rs) library:
+1. It is cross-platform, it should work on Windows, Linux and MacOS.
+2. Not required `pkg-config` to build the library and associated exported variables.
+3. Not required `tdlib` to be compiled and installed on the system.
+
+## Information
+
+We provide a precompiled version of the library for the supported platforms:
+- Linux (x86_64)
+- Windows (x86_64)
+- MacOS Intel (x86_64)
+- MacOS Apple Silicon (arm64)
+
+We compile it in the CI and we upload the artifacts to the GitHub releases, so we can download it and use to build this library.
+
+It's mainly created for using it in the [tgt](https://github.com/FedericoBruzzone/tgt) client, but it should work also for any other Rust project.
 
 Current supported TDLib version: [1.8.19](https://github.com/tdlib/td/commit/2589c3fd46925f5d57e4ec79233cd1bd0f5d0c09).
 
