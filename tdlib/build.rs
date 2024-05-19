@@ -59,10 +59,11 @@ fn main() -> std::io::Result<()> {
             let tdlib_download_path = "/home/fcb/lib/tdlib";
 
             let out_dir = Path::new(&out_dir);
-            let _ = std::process::Command::new("cp")
-                .args(&["-r", tdlib_download_path, out_dir.to_str().unwrap()])
-                .output()
-                .expect("failed to copy lib/tdlib to OUT_DIR");
+            // let _ = std::process::Command::new("cp")
+            //     .args(&["-r", tdlib_download_path, out_dir.to_str().unwrap()])
+            //     .output()
+            //     .expect("failed to copy lib/tdlib to OUT_DIR");
+            let _ = copy_dir_all(Path::new(&tdlib_download_path), Path::new(&out_dir));
 
             let prefix = format!("{}/tdlib", out_dir.to_str().unwrap());
             let include_dir = format!("{}/include", prefix);

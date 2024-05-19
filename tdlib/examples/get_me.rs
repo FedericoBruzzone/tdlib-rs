@@ -1,3 +1,5 @@
+// cargo run -p tdlib --example get_me
+
 use std::sync::{
     atomic::{AtomicBool, Ordering},
     Arc,
