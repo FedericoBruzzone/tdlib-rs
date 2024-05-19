@@ -347,43 +347,57 @@ mod tests {
     #[test]
     fn check_type_qual_name() {
         let ty = "InputPeer".parse().unwrap();
-        let name = types::qual_name(&ty);
+        let name = types::qual_name(&ty, false);
         assert_eq!(name, "crate::enums::InputPeer");
     }
 
     #[test]
     fn check_type_qual_bare_name() {
         let ty = "ipPort".parse().unwrap();
-        let name = types::qual_name(&ty);
+        let name = types::qual_name(&ty, false);
         assert_eq!(name, "crate::types::IpPort");
     }
 
     #[test]
     fn check_type_bytes_qual_name() {
         let ty = "bytes".parse().unwrap();
-        let name = types::qual_name(&ty);
-        assert_eq!(name, "Vec<u8>");
+        let name = types::qual_name(&ty, false);
+        assert_eq!(name, "String");
     }
 
     #[test]
     fn check_type_large_int_qual_name() {
         let ty = "int256".parse().unwrap();
-        let name = types::qual_name(&ty);
-        assert_eq!(name, "[u8; 32]");
+        let name = types::qual_name(&ty, false);
+        assert_eq!(name, "crate::types::Int256");
     }
 
     #[test]
     fn check_type_raw_vec_qual_name() {
         let ty = "vector<long>".parse().unwrap();
-        let name = types::qual_name(&ty);
-        assert_eq!(name, "Vec<i64>");
+        let name = types::qual_name(&ty, false);
+        assert_eq!(name, "Vec<crate::types::Long>");
+    }
+
+    #[test]
+    fn check_type_opt_raw_vec_qual_name() {
+        let ty = "vector<long>".parse().unwrap();
+        let name = types::qual_name(&ty, true);
+        assert_eq!(name, "Vec<Option<crate::types::Long>>");
     }
 
     #[test]
     fn check_type_vec_qual_name() {
         let ty = "Vector<Bool>".parse().unwrap();
-        let name = types::qual_name(&ty);
-        assert_eq!(name, "Vec<bool>");
+        let name = types::qual_name(&ty, false);
+        assert_eq!(name, "crate::enums::Vector<bool>");
+    }
+
+    #[test]
+    fn check_type_opt_vec_qual_name() {
+        let ty = "Vector<Bool>".parse().unwrap();
+        let name = types::qual_name(&ty, true);
+        assert_eq!(name, "crate::enums::Vector<Option<bool>>");
     }
 
     // Parameter methods
@@ -392,7 +406,7 @@ mod tests {
     fn check_param_qual_name() {
         let param = "pts:int".parse().unwrap();
         let name = parameters::qual_name(&param);
-        assert_eq!(name, "i32");
+        assert_eq!(name, "crate::types::Int");
     }
 
     #[test]
