@@ -4,3 +4,4 @@ members = [
   "tdlib-tl-gen",
   "tdlib-tl-parser",
 ]
+resolver = "2"
