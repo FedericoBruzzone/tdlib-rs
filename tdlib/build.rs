@@ -9,7 +9,7 @@
 use std::env;
 use std::fs::File;
 use std::io::{self, BufWriter, Read, Write};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use tdlib_tl_gen::generate_rust_code;
 use tdlib_tl_parser::parse_tl_file;
 use tdlib_tl_parser::tl::Definition;
@@ -35,8 +35,32 @@ fn load_tl(file: &str) -> io::Result<Vec<Definition>> {
 
 fn main() -> std::io::Result<()> {
     // Prevent linking libraries to avoid documentation failure
+    // #[cfg(not(feature = "dox"))]
+    // system_deps::Config::new().probe().unwrap();
+
+    // TOOD Get artifacts from github (lib folder and include folder)
     #[cfg(not(feature = "dox"))]
-    system_deps::Config::new().probe().unwrap();
+    {
+        let tdlib_download_path = "/home/fcb/lib/tdlib";
+
+        let out_dir = env::var("OUT_DIR").unwrap();
+        let out_dir = Path::new(&out_dir);
+        let _ = std::process::Command::new("cp")
+            .args(&["-r", tdlib_download_path, out_dir.to_str().unwrap()])
+            .output()
+            .expect("failed to copy lib/tdlib to OUT_DIR");
+
+        let prefix = format!("{}/tdlib", out_dir.to_str().unwrap());
+        let include_dir = format!("{}/include", prefix);
+        let lib_dir = format!("{}/lib", prefix);
+        let so_path = format!("{}/libtdjson.so.1.8.19", lib_dir);
+        println!("cargo:rustc-link-search=native={}", lib_dir);
+        println!("cargo:rustc-link-lib=dylib=tdjson");
+        println!("cargo:include={}", include_dir);
+        if !PathBuf::from(so_path.clone()).exists() {
+            panic!("tdjson shared library not found at {}", so_path);
+        }
+    }
 
     let definitions = load_tl("tl/api.tl")?;
 
