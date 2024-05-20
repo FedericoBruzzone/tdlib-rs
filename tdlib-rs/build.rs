@@ -128,12 +128,11 @@ lazy_static! {
             let lib_path = format!("{}/libtdjson.{}.dylib", lib_dir, TDLIB_VERSION);
 
             BuildConfig {
-                tdlib_path: tdlib_download_path.to_string(),
+                tdlib_path,
                 prefix,
                 include_dir,
                 lib_dir,
                 bin_dir,
-                lib_dir,
                 lib_path,
             }
         }
@@ -160,12 +159,11 @@ lazy_static! {
             let lib_path = format!("{}/libtdjson.{}.dylib", lib_dir, TDLIB_VERSION);
 
             BuildConfig {
-                tdlib_path: tdlib_download_path.to_string(),
+                tdlib_path,
                 prefix,
                 include_dir,
                 lib_dir,
                 bin_dir,
-                lib_dir,
                 lib_path,
             }
         }
