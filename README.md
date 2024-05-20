@@ -23,6 +23,25 @@ It's mainly created for using it in the [tgt](https://github.com/FedericoBruzzon
 
 Current supported TDLib version: [1.8.19](https://github.com/tdlib/td/commit/2589c3fd46925f5d57e4ec79233cd1bd0f5d0c09).
 
+### pkg-config support
+
+If you want to use the `pkg-config` support, you should enable the `pkg-config` feature in the `Cargo.toml` file:
+
+```toml
+[dependencies]
+tdlib = { version = "x", features = ["pkg-config"] }
+```
+
+remember to have the `tdlib` (version 1.8.19) installed on your system, and the following variables exported, for example in the `.bashrc` file:
+
+```sh
+# pkg-config configuration
+export PKG_CONFIG_PATH=$HOME/lib/tdlib/lib/pkgconfig/:$PKG_CONFIG_PATH
+
+# dynmic linker configuration
+export LD_LIBRARY_PATH=$HOME/lib/tdlib/lib/:$LD_LIBRARY_PATH
+```
+
 ## License
 
 This repository are licensed under either of
