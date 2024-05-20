@@ -9,7 +9,7 @@
 
 use crate::rustifier;
 use std::collections::{HashMap, HashSet};
-use tdlib_tl_parser::tl::{Category, Definition, Type};
+use tdlib_rs_parser::tl::{Category, Definition, Type};
 
 /// Additional metadata required by several parts of the generation.
 pub(crate) struct Metadata<'a> {

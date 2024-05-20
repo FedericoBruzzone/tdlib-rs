@@ -1,0 +1,49 @@
+[package]
+name = "tdlib-rs"
+version = "1.0.0"
+authors = [
+    "Federico Bruzzone <federico.bruzzone.i@gmail.com>",
+    "Andrea Longoni",
+]
+edition = "2021"
+license = "MIT OR Apache-2.0"
+homepage = "https://github.com/FedericoBruzzone/tdlib-rs"
+repository = "https://github.com/FedericoBruzzone/tdlib-rs"
+documentation = "https://docs.rs/tdlib-rs"
+keywords = [
+    "telegram",
+    "tdlib",
+    "tdjson",
+    "tdlib-rs",
+    "telegram-api",
+]
+description = "Rust wrapper around the Telegram Database Library."
+readme = "../README.md"
+
+[package.metadata.docs.rs]
+features = ["dox"]
+
+[package.metadata.system-deps]
+tdjson = "1.8.19"
+
+[features]
+default = ["bots-only-api"]
+dox = []
+bots-only-api = []
+pkg-config = []
+
+[dependencies]
+log = "0.4"
+futures-channel = "0.3"
+once_cell = "1.18"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde_with = "3.2"
+
+[build-dependencies]
+tdlib-rs-gen = { path = "../tdlib-rs-gen", version = "1.0.0" }
+tdlib-rs-parser = { path = "../tdlib-rs-parser", version = "1.0.0" }
+system-deps = "6"
+
+[dev-dependencies]
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "sync"] }

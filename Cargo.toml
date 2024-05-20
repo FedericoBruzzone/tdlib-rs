@@ -1,7 +1,7 @@
 [workspace]
 members = [
-  "tdlib",
-  "tdlib-tl-gen",
-  "tdlib-tl-parser",
+  "tdlib-rs",
+  "tdlib-rs-gen",
+  "tdlib-rs-parser",
 ]
 resolver = "2"

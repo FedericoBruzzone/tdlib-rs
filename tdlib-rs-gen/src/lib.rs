@@ -16,7 +16,7 @@ mod rustifier;
 mod types;
 
 use std::io::{self, Write};
-use tdlib_tl_parser::tl::{Definition, Type};
+use tdlib_rs_parser::tl::{Definition, Type};
 
 /// Don't generate types for definitions of this type,
 /// since they are "core" types and treated differently.

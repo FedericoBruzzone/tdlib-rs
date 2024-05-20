@@ -12,7 +12,7 @@
 use crate::metadata::Metadata;
 use crate::rustifier;
 use std::io::{self, Write};
-use tdlib_tl_parser::tl::{Category, Definition};
+use tdlib_rs_parser::tl::{Category, Definition};
 
 /// Defines the `function` corresponding to the definition:
 ///

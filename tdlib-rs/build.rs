@@ -1,3 +1,4 @@
+// Copyright 2024 - developers of the `tgt` and `tdlib-rs` projects.
 // Copyright 2021 - developers of the `tdlib-rs` project.
 // Copyright 2020 - developers of the `grammers` project.
 //
@@ -12,9 +13,9 @@ use std::io::{self, BufWriter, Read, Write};
 use std::path::{Path, PathBuf};
 #[cfg(feature = "pkg-config")]
 use system_deps;
-use tdlib_tl_gen::generate_rust_code;
-use tdlib_tl_parser::parse_tl_file;
-use tdlib_tl_parser::tl::Definition;
+use tdlib_rs_gen::generate_rust_code;
+use tdlib_rs_parser::parse_tl_file;
+use tdlib_rs_parser::tl::Definition;
 
 /// Load the type language definitions from a certain file.
 /// Parse errors will be printed to `stderr`, and only the

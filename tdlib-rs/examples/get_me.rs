@@ -1,10 +1,10 @@
-// cargo run -p tdlib --example get_me
+// cargo run -p tdlib-rs --example get_me
 
 use std::sync::{
     atomic::{AtomicBool, Ordering},
     Arc,
 };
-use tdlib::{
+use tdlib_rs::{
     enums::{AuthorizationState, Update, User},
     functions,
 };
@@ -95,7 +95,7 @@ async fn handle_authorization_state(
 #[tokio::main]
 async fn main() {
     // Create the client object
-    let client_id = tdlib::create_client();
+    let client_id = tdlib_rs::create_client();
 
     // Create a mpsc channel for handling AuthorizationState updates separately
     // from the task
@@ -108,7 +108,7 @@ async fn main() {
     // Spawn a task to receive updates/responses
     let handle = tokio::spawn(async move {
         while run_flag_clone.load(Ordering::Acquire) {
-            if let Some((update, _client_id)) = tdlib::receive() {
+            if let Some((update, _client_id)) = tdlib_rs::receive() {
                 handle_update(update, &auth_tx).await;
             }
         }
