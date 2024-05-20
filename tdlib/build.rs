@@ -10,6 +10,8 @@ use std::env;
 use std::fs::{self, File};
 use std::io::{self, BufWriter, Read, Write};
 use std::path::{Path, PathBuf};
+#[cfg(feature = "pkg-config")]
+use system_deps;
 use tdlib_tl_gen::generate_rust_code;
 use tdlib_tl_parser::parse_tl_file;
 use tdlib_tl_parser::tl::Definition;
@@ -47,63 +49,84 @@ fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> io::Result<()> 
     Ok(())
 }
 
-fn main() -> std::io::Result<()> {
+fn linux_x86_64() {
     let out_dir = env::var("OUT_DIR").unwrap();
+    let tdlib_download_path = "/home/fcb/lib/tdlib";
+
+    let out_dir = Path::new(&out_dir);
+    let prefix = format!("{}/tdlib", out_dir.to_str().unwrap());
+    let _ = copy_dir_all(Path::new(&tdlib_download_path), Path::new(&prefix));
+
+    let include_dir = format!("{}/include", prefix);
+    let lib_dir = format!("{}/lib", prefix);
+    let so_path = format!("{}/libtdjson.so.1.8.19", lib_dir);
+    println!("cargo:rustc-link-search=native={}", lib_dir);
+    println!("cargo:rustc-link-lib=dylib=tdjson");
+    println!("cargo:include={}", include_dir);
+    if !PathBuf::from(so_path.clone()).exists() {
+        panic!("tdjson shared library not found at {}", so_path);
+    }
+}
+
+fn windows_x86_64() {
+    let out_dir = env::var("OUT_DIR").unwrap();
+    let tdlib_download_path = r"C:\Users\andre\Documents\tdlib\td\tdlib";
+
+    let out_dir = Path::new(&out_dir);
+    let prefix = format!("{}/tdlib", out_dir.to_str().unwrap());
+
+    let _ = copy_dir_all(Path::new(&tdlib_download_path), Path::new(&prefix));
+
+    println!("cargo:rustc-link-lib=dylib=tdjson");
+
+    let lib_dir = format!("{}/lib", prefix);
+    println!("cargo:rustc-link-search=native={}", lib_dir);
+
+    // for the .dll
+    let bin_dir = format!("{}/bin", prefix);
+    println!("cargo:rustc-link-search=native={}", bin_dir);
+
+    let include_dir = format!("{}/include", prefix);
+    println!("cargo:include={}", include_dir);
+
+    let lib_path = format!("{}/tdjson.lib", lib_dir);
+    if !PathBuf::from(lib_path.clone()).exists() {
+        panic!("tdjson shared library not found at {}", lib_path);
+    }
+}
+
+fn _macos_x86_64() {
+    todo!()
+}
+
+fn main() -> std::io::Result<()> {
     // TODO Get artifacts from github (lib folder and include folder)
 
     // Prevent linking libraries to avoid documentation failure
     #[cfg(not(feature = "dox"))]
     {
-        #[cfg(all(target_os = "linux", target_arch = "x86_64"))]
+        // It requires the following variables to be set:
+        // - export PKG_CONFIG_PATH=$HOME/lib/tdlib/lib/pkgconfig/:$PKG_CONFIG_PATH
+        // - export LD_LIBRARY_PATH=$HOME/lib/tdlib/lib/:$LD_LIBRARY_PATH
+        #[cfg(feature = "pkg-config")]
         {
-            let tdlib_download_path = "/home/fcb/lib/tdlib";
-
-            let out_dir = Path::new(&out_dir);
-            // let _ = std::process::Command::new("cp")
-            //     .args(&["-r", tdlib_download_path, out_dir.to_str().unwrap()])
-            //     .output()
-            //     .expect("failed to copy lib/tdlib to OUT_DIR");
-            let _ = copy_dir_all(Path::new(&tdlib_download_path), Path::new(&out_dir));
-
-            let prefix = format!("{}/tdlib", out_dir.to_str().unwrap());
-            let include_dir = format!("{}/include", prefix);
-            let lib_dir = format!("{}/lib", prefix);
-            let so_path = format!("{}/libtdjson.so.1.8.19", lib_dir);
-            println!("cargo:rustc-link-search=native={}", lib_dir);
-            println!("cargo:rustc-link-lib=dylib=tdjson");
-            println!("cargo:include={}", include_dir);
-            if !PathBuf::from(so_path.clone()).exists() {
-                panic!("tdjson shared library not found at {}", so_path);
-            }
+            system_deps::Config::new().probe().unwrap();
         }
 
-        #[cfg(all(target_os = "windows", target_arch = "x86_64"))]
+        #[cfg(not(feature = "pkg-config"))]
         {
-            let tdlib_download_path = r"C:\Users\andre\Documents\tdlib\td\tdlib";
+            #[cfg(all(target_os = "linux", target_arch = "x86_64"))]
+            linux_x86_64();
 
-            let out_dir = Path::new(&out_dir);
-            let prefix = format!("{}/tdlib", out_dir.to_str().unwrap());
+            #[cfg(all(target_os = "windows", target_arch = "x86_64"))]
+            windows_x86_64();
 
-            let _ = copy_dir_all(Path::new(&tdlib_download_path), Path::new(&prefix));
-
-            println!("cargo:rustc-link-lib=dylib=tdjson");
-
-            let lib_dir = format!("{}/lib", prefix);
-            println!("cargo:rustc-link-search=native={}", lib_dir);
-
-            // for the .dll
-            let bin_dir = format!("{}/bin", prefix);
-            println!("cargo:rustc-link-search=native={}", bin_dir);
-
-            let include_dir = format!("{}/include", prefix);
-            println!("cargo:include={}", include_dir);
-
-            let lib_path = format!("{}/tdjson.lib", lib_dir);
-            if !PathBuf::from(lib_path.clone()).exists() {
-                panic!("tdjson shared library not found at {}", lib_path);
-            }
+            #[cfg(all(target_os = "macos", target_arch = "x86_64"))]
+            todo!()
         }
     }
+
+    let out_dir = env::var("OUT_DIR").unwrap();
 
     let definitions = load_tl("tl/api.tl")?;
 
