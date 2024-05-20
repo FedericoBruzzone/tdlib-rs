@@ -35,6 +35,7 @@ fn load_tl(file: &str) -> io::Result<Vec<Definition>> {
         .collect())
 }
 
+#[cfg(not(feature = "pkg-config"))]
 fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> io::Result<()> {
     fs::create_dir_all(&dst)?;
     for entry in fs::read_dir(src)? {
@@ -49,6 +50,7 @@ fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> io::Result<()> 
     Ok(())
 }
 
+#[cfg(all(target_os = "linux", target_arch = "x86_64"))]
 fn linux_x86_64() {
     let out_dir = env::var("OUT_DIR").unwrap();
     let tdlib_download_path = "/home/fcb/lib/tdlib";
@@ -68,6 +70,7 @@ fn linux_x86_64() {
     }
 }
 
+#[cfg(all(target_os = "windows", target_arch = "x86_64"))]
 fn windows_x86_64() {
     let out_dir = env::var("OUT_DIR").unwrap();
     let tdlib_download_path = r"C:\Users\andre\Documents\tdlib\td\tdlib";
@@ -95,8 +98,44 @@ fn windows_x86_64() {
     }
 }
 
-fn _macos_x86_64() {
-    todo!()
+#[cfg(all(target_os = "macos", target_arch = "x86_64"))]
+fn macos_x86_64() {
+    let out_dir = env::var("OUT_DIR").unwrap();
+    let tdlib_download_path = "/Users/federicobruzzone/lib/tdlib";
+
+    let out_dir = Path::new(&out_dir);
+    let prefix = format!("{}/tdlib", out_dir.to_str().unwrap());
+    let _ = copy_dir_all(Path::new(&tdlib_download_path), Path::new(&prefix));
+
+    let include_dir = format!("{}/include", prefix);
+    let lib_dir = format!("{}/lib", prefix);
+    let so_path = format!("{}/libtdjson.1.8.19.dylib", lib_dir);
+    println!("cargo:rustc-link-search=native={}", lib_dir);
+    println!("cargo:rustc-link-lib=dylib=tdjson");
+    println!("cargo:include={}", include_dir);
+    if !PathBuf::from(so_path.clone()).exists() {
+        panic!("tdjson shared library not found at {}", so_path);
+    }
+}
+
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn macos_aarch64() {
+    let out_dir = env::var("OUT_DIR").unwrap();
+    let tdlib_download_path = "/Users/federicobruzzone/lib/tdlib";
+
+    let out_dir = Path::new(&out_dir);
+    let prefix = format!("{}/tdlib", out_dir.to_str().unwrap());
+    let _ = copy_dir_all(Path::new(&tdlib_download_path), Path::new(&prefix));
+
+    let include_dir = format!("{}/include", prefix);
+    let lib_dir = format!("{}/lib", prefix);
+    let so_path = format!("{}/libtdjson.1.8.19.dylib", lib_dir);
+    println!("cargo:rustc-link-search=native={}", lib_dir);
+    println!("cargo:rustc-link-lib=dylib=tdjson");
+    println!("cargo:include={}", include_dir);
+    if !PathBuf::from(so_path.clone()).exists() {
+        panic!("tdjson shared library not found at {}", so_path);
+    }
 }
 
 fn main() -> std::io::Result<()> {
@@ -122,7 +161,10 @@ fn main() -> std::io::Result<()> {
             windows_x86_64();
 
             #[cfg(all(target_os = "macos", target_arch = "x86_64"))]
-            todo!()
+            macos_x86_64();
+
+            #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+            macos_aarch64();
         }
     }
 
