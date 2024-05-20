@@ -7,6 +7,7 @@
 // <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
+use lazy_static::lazy_static;
 use std::env;
 use std::fs::{self, File};
 use std::io::{self, BufWriter, Read, Write};
@@ -16,6 +17,160 @@ use system_deps;
 use tdlib_rs_gen::generate_rust_code;
 use tdlib_rs_parser::parse_tl_file;
 use tdlib_rs_parser::tl::Definition;
+
+/// The version of the TDLib library.
+const TDLIB_VERSION: &str = "1.8.19";
+
+/// The build configuration.
+struct BuildConfig {
+    /// It can be:
+    ///   - the downloaded tdlib path, automatically downloaded from the github release
+    ///   - the system tdlib path, setted by the user using the LOCAL_TDLIB_PATH env variable
+    tdlib_path: String,
+    /// The prefix where the tdlib will be copied. It is the concatenation of the out_dir and the `tdlib` folder name.
+    prefix: String,
+    /// The include directory where the tdlib headers are placed.
+    /// It is the concatenation of the prefix and the `include` folder name.
+    include_dir: String,
+    /// The lib directory where the tdlib shared libraries are placed.
+    /// It is the concatenation of the prefix and the `lib` folder name.
+    lib_dir: String,
+    /// The bin directory where the tdlib binaries are placed.
+    /// It is the concatenation of the prefix and the `bin` folder name.
+    bin_dir: Option<String>,
+    /// The shared library file path.
+    lib_path: String,
+}
+
+lazy_static! {
+    static ref BUILD_CONFIG: BuildConfig = {
+        #[cfg(all(target_os = "linux", target_arch = "x86_64"))]
+        {
+            let out_dir = env::var("OUT_DIR").unwrap();
+            let tdlib_path = {
+                if cfg!(feature = "local-tdlib") {
+                    match env::var("LOCAL_TDLIB_PATH") {
+                        Ok(path) => path,
+                        Err(_) => {
+                            panic!("The LOCAL_TDLIB_PATH env variable must be set to the path of the tdlib folder");
+                        }
+                    }
+                } else {
+                    "/home/fcb/lib/tdlib".to_string()
+                }
+            };
+            let prefix = format!("{}/tdlib", out_dir.to_string());
+            let include_dir = format!("{}/include", prefix);
+            let lib_dir = format!("{}/lib", prefix);
+            let bin_dir = None;
+            let lib_path = format!("{}/libtdjson.so.{}", lib_dir, TDLIB_VERSION);
+
+            BuildConfig {
+                tdlib_path,
+                prefix,
+                include_dir,
+                lib_dir,
+                bin_dir,
+                lib_path,
+            }
+        }
+
+        #[cfg(all(target_os = "windows", target_arch = "x86_64"))]
+        {
+            let out_dir = env::var("OUT_DIR").unwrap();
+            let tdlib_path = {
+                if cfg!(feature = "local-tdlib") {
+                    match env::var("LOCAL_TDLIB_PATH") {
+                        Ok(path) => path,
+                        Err(_) => {
+                            panic!("The LOCAL_TDLIB_PATH env variable must be set to the path of the tdlib folder");
+                        }
+                    }
+                } else {
+                    r"C:\Users\andre\Documents\tdlib\td\tdlib".to_string()
+                }
+            };
+            let prefix = format!("{}/tdlib", out_dir.to_string());
+            let include_dir = format!("{}/include", prefix);
+            let lib_dir = format!("{}/lib", prefix);
+            let bin_dir = Some(format!("{}/bin", prefix));
+            let lib_path = format!("{}/tdjson.dll", lib_dir);
+
+            BuildConfig {
+                tdlib_path,
+                prefix,
+                include_dir,
+                lib_dir,
+                bin_dir,
+                lib_path,
+            }
+        }
+
+        #[cfg(all(target_os = "macos", target_arch = "x86_64"))]
+        {
+            let out_dir = env::var("OUT_DIR").unwrap();
+            let tdlib_path = {
+                if cfg!(feature = "local-tdlib") {
+                    match env::var("LOCAL_TDLIB_PATH") {
+                        Ok(path) => path,
+                        Err(_) => {
+                            panic!("The LOCAL_TDLIB_PATH env variable must be set to the path of the tdlib folder");
+                        }
+                    }
+                } else {
+                    "/Users/federicobruzzone/lib/tdlib".to_string()
+                }
+            };
+            let prefix = format!("{}/tdlib", out_dir.to_string());
+            let include_dir = format!("{}/include", prefix);
+            let lib_dir = format!("{}/lib", prefix);
+            let bin_dir = None;
+            let lib_path = format!("{}/libtdjson.{}.dylib", lib_dir, TDLIB_VERSION);
+
+            BuildConfig {
+                tdlib_path: tdlib_download_path.to_string(),
+                prefix,
+                include_dir,
+                lib_dir,
+                bin_dir,
+                lib_dir,
+                lib_path,
+            }
+        }
+
+        #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+        {
+            let out_dir = env::var("OUT_DIR").unwrap();
+            let tdlib_download_path = {
+                if cfg!(feature = "local-tdlib") {
+                    match env::var("LOCAL_TDLIB_PATH") {
+                        Ok(path) => path,
+                        Err(_) => {
+                            panic!("The LOCAL_TDLIB_PATH env variable must be set to the path of the tdlib folder");
+                        }
+                    }
+                } else {
+                    "/Users/federicobruzzone/lib/tdlib";
+                };
+            };
+            let prefix = format!("{}/tdlib", out_dir.to_string());
+            let include_dir = format!("{}/include", prefix);
+            let lib_dir = format!("{}/lib", prefix);
+            let bin_dir = None;
+            let lib_path = format!("{}/libtdjson.{}.dylib", lib_dir, TDLIB_VERSION);
+
+            BuildConfig {
+                tdlib_path: tdlib_download_path.to_string(),
+                prefix,
+                include_dir,
+                lib_dir,
+                bin_dir,
+                lib_dir,
+                lib_path,
+            }
+        }
+    };
+}
 
 /// Load the type language definitions from a certain file.
 /// Parse errors will be printed to `stderr`, and only the
@@ -37,6 +192,7 @@ fn load_tl(file: &str) -> io::Result<Vec<Definition>> {
 }
 
 #[cfg(not(feature = "pkg-config"))]
+/// Copy all files from a directory to another.
 fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> io::Result<()> {
     fs::create_dir_all(&dst)?;
     for entry in fs::read_dir(src)? {
@@ -51,92 +207,37 @@ fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> io::Result<()> 
     Ok(())
 }
 
-#[cfg(all(target_os = "linux", target_arch = "x86_64"))]
-fn linux_x86_64() {
-    let out_dir = env::var("OUT_DIR").unwrap();
-    let tdlib_download_path = "/home/fcb/lib/tdlib";
+#[cfg(not(feature = "pkg-config"))]
+/// Build the project using the generic build configuration.
+/// The current supported platforms are:
+/// - Linux x86_64
+/// - Windows x86_64
+/// - MacOS x86_64
+/// - MacOS aarch64
+fn generic_build() {
+    let build_config = &*BUILD_CONFIG;
 
-    let out_dir = Path::new(&out_dir);
-    let prefix = format!("{}/tdlib", out_dir.to_str().unwrap());
-    let _ = copy_dir_all(Path::new(&tdlib_download_path), Path::new(&prefix));
+    let tdlib_path = &build_config.tdlib_path;
+    let prefix = &build_config.prefix;
+    let _ = copy_dir_all(Path::new(&tdlib_path), Path::new(&prefix));
 
-    let include_dir = format!("{}/include", prefix);
-    let lib_dir = format!("{}/lib", prefix);
-    let so_path = format!("{}/libtdjson.so.1.8.19", lib_dir);
-    println!("cargo:rustc-link-search=native={}", lib_dir);
-    println!("cargo:rustc-link-lib=dylib=tdjson");
-    println!("cargo:include={}", include_dir);
-    if !PathBuf::from(so_path.clone()).exists() {
-        panic!("tdjson shared library not found at {}", so_path);
-    }
-}
-
-#[cfg(all(target_os = "windows", target_arch = "x86_64"))]
-fn windows_x86_64() {
-    let out_dir = env::var("OUT_DIR").unwrap();
-    let tdlib_download_path = r"C:\Users\andre\Documents\tdlib\td\tdlib";
-
-    let out_dir = Path::new(&out_dir);
-    let prefix = format!("{}/tdlib", out_dir.to_str().unwrap());
-
-    let _ = copy_dir_all(Path::new(&tdlib_download_path), Path::new(&prefix));
-
-    println!("cargo:rustc-link-lib=dylib=tdjson");
-
-    let lib_dir = format!("{}/lib", prefix);
-    println!("cargo:rustc-link-search=native={}", lib_dir);
-
-    // for the .dll
-    let bin_dir = format!("{}/bin", prefix);
-    println!("cargo:rustc-link-search=native={}", bin_dir);
-
-    let include_dir = format!("{}/include", prefix);
-    println!("cargo:include={}", include_dir);
-
-    let lib_path = format!("{}/tdjson.lib", lib_dir);
+    let lib_path = &build_config.lib_path;
     if !PathBuf::from(lib_path.clone()).exists() {
         panic!("tdjson shared library not found at {}", lib_path);
     }
-}
 
-#[cfg(all(target_os = "macos", target_arch = "x86_64"))]
-fn macos_x86_64() {
-    let out_dir = env::var("OUT_DIR").unwrap();
-    let tdlib_download_path = "/Users/federicobruzzone/lib/tdlib";
-
-    let out_dir = Path::new(&out_dir);
-    let prefix = format!("{}/tdlib", out_dir.to_str().unwrap());
-    let _ = copy_dir_all(Path::new(&tdlib_download_path), Path::new(&prefix));
-
-    let include_dir = format!("{}/include", prefix);
-    let lib_dir = format!("{}/lib", prefix);
-    let so_path = format!("{}/libtdjson.1.8.19.dylib", lib_dir);
-    println!("cargo:rustc-link-search=native={}", lib_dir);
-    println!("cargo:rustc-link-lib=dylib=tdjson");
-    println!("cargo:include={}", include_dir);
-    if !PathBuf::from(so_path.clone()).exists() {
-        panic!("tdjson shared library not found at {}", so_path);
+    let bin_dir = &build_config.bin_dir;
+    if let Some(bin_dir) = bin_dir {
+        println!("cargo:rustc-link-search=native={}", bin_dir);
     }
-}
 
-#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
-fn macos_aarch64() {
-    let out_dir = env::var("OUT_DIR").unwrap();
-    let tdlib_download_path = "/Users/federicobruzzone/lib/tdlib";
-
-    let out_dir = Path::new(&out_dir);
-    let prefix = format!("{}/tdlib", out_dir.to_str().unwrap());
-    let _ = copy_dir_all(Path::new(&tdlib_download_path), Path::new(&prefix));
-
-    let include_dir = format!("{}/include", prefix);
-    let lib_dir = format!("{}/lib", prefix);
-    let so_path = format!("{}/libtdjson.1.8.19.dylib", lib_dir);
+    let lib_dir = &build_config.lib_dir;
     println!("cargo:rustc-link-search=native={}", lib_dir);
-    println!("cargo:rustc-link-lib=dylib=tdjson");
+
+    let include_dir = &build_config.include_dir;
     println!("cargo:include={}", include_dir);
-    if !PathBuf::from(so_path.clone()).exists() {
-        panic!("tdjson shared library not found at {}", so_path);
-    }
+
+    println!("cargo:rustc-link-lib=dylib=tdjson");
 }
 
 fn main() -> std::io::Result<()> {
@@ -155,17 +256,8 @@ fn main() -> std::io::Result<()> {
 
         #[cfg(not(feature = "pkg-config"))]
         {
-            #[cfg(all(target_os = "linux", target_arch = "x86_64"))]
-            linux_x86_64();
-
-            #[cfg(all(target_os = "windows", target_arch = "x86_64"))]
-            windows_x86_64();
-
-            #[cfg(all(target_os = "macos", target_arch = "x86_64"))]
-            macos_x86_64();
-
-            #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
-            macos_aarch64();
+            lazy_static::initialize(&BUILD_CONFIG);
+            generic_build();
         }
     }
 
@@ -178,5 +270,7 @@ fn main() -> std::io::Result<()> {
     generate_rust_code(&mut file, &definitions, cfg!(feature = "bots-only-api"))?;
 
     file.flush()?;
+
+    println!("cargo:rerun-if-changed=build.rs");
     Ok(())
 }

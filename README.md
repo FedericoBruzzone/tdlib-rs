@@ -4,7 +4,7 @@ A Rust wrapper around the Telegram Database library. It includes a generator to 
 
 ## Why this fork?
 
-This is an improved version of the [tdlib-rs](https://github.com/paper-plane-developers/tdlib-rs) library, with the following features:
+This is an improved version of the [tdlib-rs](https://github.com/paper-plane-developers/tdlib-rs) library, with the following additional features:
 1. It is cross-platform, it should work on Windows, Linux and MacOS.
 2. Not required `pkg-config` to build the library and associated exported variables.
 3. Not required `tdlib` to be compiled and installed on the system.
@@ -23,13 +23,29 @@ It's mainly created for using it in the [tgt](https://github.com/FedericoBruzzon
 
 Current supported TDLib version: [1.8.19](https://github.com/tdlib/td/commit/2589c3fd46925f5d57e4ec79233cd1bd0f5d0c09).
 
+### local-tdlib support
+
+If you want to use the `local-tdlib` support, you should enable the `local-tdlib` feature in the `Cargo.toml` file:
+
+```toml
+[dependencies]
+tdlib = { version = "1.0.0", features = [ "local-tdlib" ] }
+```
+
+remember to have the `tdlib` (version 1.8.19) compiled and installed on your system, and the following variables exported, for example in the `.bashrc` file:
+
+```sh
+# The path to the tdlib folder
+export LOCAL_TDLIB_PATH=$HOME/lib/tdlib
+```
+
 ### pkg-config support
 
 If you want to use the `pkg-config` support, you should enable the `pkg-config` feature in the `Cargo.toml` file:
 
 ```toml
 [dependencies]
-tdlib = { version = "x", features = ["pkg-config"] }
+tdlib = { version = "1.0.0", features = [ "pkg-config" ] }
 ```
 
 remember to have the `tdlib` (version 1.8.19) installed on your system, and the following variables exported, for example in the `.bashrc` file:

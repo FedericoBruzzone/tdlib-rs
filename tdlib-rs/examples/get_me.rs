@@ -1,4 +1,6 @@
 // cargo run -p tdlib-rs --example get_me
+// cargo run -p tdlib-rs --example get_me --features local-tdlib
+// cargo run -p tdlib-rs --example get_me --features pkg-config
 
 use std::sync::{
     atomic::{AtomicBool, Ordering},

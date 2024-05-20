@@ -28,9 +28,10 @@ tdjson = "1.8.19"
 
 [features]
 default = ["bots-only-api"]
-dox = []
 bots-only-api = []
-pkg-config = []
+dox = [] # This feature is used build the documentation preventing linking to the tdjson library
+pkg-config = [] # This feature is used to build the library using pkg-config
+local-tdlib = [] # This feature is used to build the library using the local tdlib library
 
 [dependencies]
 log = "0.4"
@@ -44,6 +45,7 @@ serde_with = "3.2"
 tdlib-rs-gen = { path = "../tdlib-rs-gen", version = "1.0.0" }
 tdlib-rs-parser = { path = "../tdlib-rs-parser", version = "1.0.0" }
 system-deps = "6"
+lazy_static = "1.4.0"
 
 [dev-dependencies]
 tokio = { version = "1", features = ["macros", "rt-multi-thread", "sync"] }
