@@ -1,8 +1,6 @@
 // Copyright 2020 - developers of the `grammers` project.
 // Copyright 2021 - developers of the `tdlib-rs` project.
 // Copyright 2024 - developers of the `tgt` and `tdlib-rs` projects.
-// Copyright 2021 - developers of the `tdlib-rs` project.
-// Copyright 2020 - developers of the `grammers` project.
 //
 // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 // https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -14,13 +12,12 @@ use std::env;
 use std::fs::{self, File};
 use std::io::{self, BufWriter, Read, Write};
 use std::path::{Path, PathBuf};
-#[cfg(feature = "pkg-config")]
-use system_deps;
 use tdlib_rs_gen::generate_rust_code;
 use tdlib_rs_parser::parse_tl_file;
 use tdlib_rs_parser::tl::Definition;
 
 /// The version of the TDLib library.
+#[allow(dead_code)]
 const TDLIB_VERSION: &str = "1.8.19";
 
 /// The build configuration.
@@ -61,7 +58,7 @@ lazy_static! {
                     "/home/fcb/lib/tdlib".to_string()
                 }
             };
-            let prefix = format!("{}/tdlib", out_dir.to_string());
+            let prefix = format!("{}/tdlib", out_dir);
             let include_dir = format!("{}/include", prefix);
             let lib_dir = format!("{}/lib", prefix);
             let bin_dir = None;
@@ -92,11 +89,11 @@ lazy_static! {
                     r"C:\Users\andre\Documents\tdlib\td\tdlib".to_string()
                 }
             };
-            let prefix = format!("{}/tdlib", out_dir.to_string());
-            let include_dir = format!("{}/include", prefix);
-            let lib_dir = format!("{}/lib", prefix);
-            let bin_dir = Some(format!("{}/bin", prefix));
-            let lib_path = format!("{}/tdjson.dll", lib_dir);
+            let prefix = format!(r"{}\tdlib", out_dir);
+            let include_dir = format!(r"{}\include", prefix);
+            let lib_dir = format!(r"{}\lib", prefix);
+            let bin_dir = Some(format!(r"{}\bin", prefix));
+            let lib_path = format!(r"{}\tdjson.lib", lib_dir);
 
             BuildConfig {
                 tdlib_path,
@@ -123,7 +120,7 @@ lazy_static! {
                     "/Users/federicobruzzone/lib/tdlib".to_string()
                 }
             };
-            let prefix = format!("{}/tdlib", out_dir.to_string());
+            let prefix = format!("{}/tdlib", out_dir);
             let include_dir = format!("{}/include", prefix);
             let lib_dir = format!("{}/lib", prefix);
             let bin_dir = None;
@@ -154,7 +151,7 @@ lazy_static! {
                     "/Users/federicobruzzone/lib/tdlib";
                 };
             };
-            let prefix = format!("{}/tdlib", out_dir.to_string());
+            let prefix = format!("{}/tdlib", out_dir);
             let include_dir = format!("{}/include", prefix);
             let lib_dir = format!("{}/lib", prefix);
             let bin_dir = None;
@@ -180,7 +177,6 @@ fn load_tl(file: &str) -> io::Result<Vec<Definition>> {
     let mut contents = String::new();
     file.read_to_string(&mut contents)?;
     Ok(parse_tl_file(contents)
-        .into_iter()
         .filter_map(|d| match d {
             Ok(d) => Some(d),
             Err(e) => {
@@ -271,6 +267,10 @@ fn main() -> std::io::Result<()> {
 
     file.flush()?;
 
+    #[cfg(feature = "local-tdlib")]
+    println!("cargo:rerun-if-env-changed=LOCAL_TDLIB_PATH");
+
     println!("cargo:rerun-if-changed=build.rs");
+
     Ok(())
 }
