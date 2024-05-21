@@ -1,3 +1,5 @@
+// Copyright 2020 - developers of the `grammers` project.
+// Copyright 2021 - developers of the `tdlib-rs` project.
 // Copyright 2024 - developers of the `tgt` and `tdlib-rs` projects.
 // Copyright 2021 - developers of the `tdlib-rs` project.
 // Copyright 2020 - developers of the `grammers` project.
