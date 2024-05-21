@@ -104,24 +104,22 @@ mod tests {
 
     #[test]
     fn check_bare() {
-        assert!(match Type::from_str("foo") {
-            Ok(Type { bare: true, .. }) => true,
-            _ => false,
-        });
-        assert!(match Type::from_str("Foo") {
-            Ok(Type { bare: false, .. }) => true,
-            _ => false,
-        });
+        assert!(matches!(Type::from_str("foo"), Ok(Type { bare: true, .. })));
+        assert!(matches!(
+            Type::from_str("Foo"),
+            Ok(Type { bare: false, .. })
+        ));
     }
 
     #[test]
     fn check_generic_arg() {
-        assert!(match Type::from_str("foo") {
+        assert!(matches!(
+            Type::from_str("foo"),
             Ok(Type {
-                generic_arg: None, ..
-            }) => true,
-            _ => false,
-        });
+                generic_arg: None,
+                ..
+            })
+        ));
         assert!(match Type::from_str("foo<bar>") {
             Ok(Type {
                 generic_arg: Some(x),

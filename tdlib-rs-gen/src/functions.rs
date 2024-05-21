@@ -145,6 +145,7 @@ pub(crate) fn write_functions_mod<W: Write>(
     gen_bots_only_api: bool,
 ) -> io::Result<()> {
     // Begin outermost mod
+    writeln!(file, "#[allow(clippy::all)]")?;
     writeln!(file, "pub mod functions {{")?;
     writeln!(file, "    use serde_json::json;")?;
     writeln!(file, "    use crate::send_request;")?;

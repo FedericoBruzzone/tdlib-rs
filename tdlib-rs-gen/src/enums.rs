@@ -82,6 +82,7 @@ pub(crate) fn write_enums_mod<W: Write>(
     gen_bots_only_api: bool,
 ) -> io::Result<()> {
     // Begin outermost mod
+    writeln!(file, "#[allow(clippy::all)]")?;
     writeln!(file, "pub mod enums {{")?;
     writeln!(file, "    use serde::{{Deserialize, Serialize}};")?;
 
