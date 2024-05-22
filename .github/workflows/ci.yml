@@ -18,7 +18,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Run cargo build
-        run: cargo build --features dox
+        run: cargo build --features docs
 
   rustfmt:
     name: Rustfmt

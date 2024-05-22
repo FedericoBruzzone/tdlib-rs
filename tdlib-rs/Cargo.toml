@@ -10,28 +10,26 @@ license = "MIT OR Apache-2.0"
 homepage = "https://github.com/FedericoBruzzone/tdlib-rs"
 repository = "https://github.com/FedericoBruzzone/tdlib-rs"
 documentation = "https://docs.rs/tdlib-rs"
-keywords = [
-    "telegram",
-    "tdlib",
-    "tdjson",
-    "tdlib-rs",
-    "telegram-api",
-]
+keywords = ["telegram", "tdlib", "tdjson", "tdlib-rs", "telegram-api"]
 description = "Rust wrapper around the Telegram Database Library."
 readme = "../README.md"
 
 [package.metadata.docs.rs]
-features = ["dox"]
+features = ["docs"]
 
 [package.metadata.system-deps]
 tdjson = "1.8.19"
 
 [features]
 default = ["bots-only-api"]
+# This feature is used to enable the functions only available to the Telegram bots
 bots-only-api = []
-dox = [] # This feature is used build the documentation preventing linking to the tdjson library
-pkg-config = [] # This feature is used to build the library using pkg-config
-local-tdlib = [] # This feature is used to build the library using the local tdlib library
+# This feature is used to build the documentation preventing linking to the tdjson library
+docs = []
+# This feature is used to build the library using pkg-config
+pkg-config = []
+# This feature is used to build the library using the local tdlib library
+local-tdlib = []
 
 [dependencies]
 log = "0.4"
@@ -46,6 +44,8 @@ tdlib-rs-gen = { path = "../tdlib-rs-gen", version = "1.0.0" }
 tdlib-rs-parser = { path = "../tdlib-rs-parser", version = "1.0.0" }
 system-deps = "6"
 lazy_static = "1.4.0"
+reqwest = { version = "0.12.4", features = ["blocking"] }
+zip = "1.3.1"
 
 [dev-dependencies]
 tokio = { version = "1", features = ["macros", "rt-multi-thread", "sync"] }
