@@ -7,8 +7,8 @@
 // <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
-#[cfg(not(any(feature = "docs", feature = "pkg-config")))]
-use lazy_static::lazy_static;
+// #[cfg(not(any(feature = "docs", feature = "pkg-config")))]
+// use lazy_static::lazy_static;
 use std::env;
 use std::fs::File;
 use std::io::{BufWriter, Read, Write};
@@ -21,99 +21,6 @@ use tdlib_rs_parser::tl::Definition;
 #[cfg(not(any(feature = "docs", feature = "pkg-config")))]
 /// The version of the TDLib library.
 const TDLIB_VERSION: &str = "1.8.19";
-
-#[cfg(not(any(feature = "docs", feature = "pkg-config")))]
-/// The build configuration.
-struct BuildConfig {
-    /// It can be:
-    ///   - the downloaded tdlib path, automatically downloaded from the github release
-    ///   - the system tdlib path, setted by the user using the LOCAL_TDLIB_PATH env variable
-    // tdlib_path: Option<String>,
-    // /// The prefix where the tdlib will be copied. It is the concatenation of the out_dir and the `tdlib` folder name.
-    // prefix: String,
-    /// The include directory where the tdlib headers are placed.
-    /// It is the concatenation of the prefix and the `include` folder name.
-    include_dir: String,
-    /// The lib directory where the tdlib shared libraries are placed.
-    /// It is the concatenation of the prefix and the `lib` folder name.
-    lib_dir: String,
-    /// The shared library file path.
-    lib_path: String,
-    /// The bin directory where the tdlib binaries are placed.
-    /// It is the concatenation of the prefix and the `bin` folder name.
-    bin_dir: Option<String>,
-}
-
-#[cfg(not(any(feature = "docs", feature = "pkg-config", not(feature = "local-tdlib"))))]
-fn get_tdlib_path() -> Option<String> {
-    if cfg!(feature = "local-tdlib") {
-        match env::var("LOCAL_TDLIB_PATH") {
-            Ok(path) => Some(path),
-            Err(_) => {
-                panic!(
-                    "The LOCAL_TDLIB_PATH env variable must be set to the path of the tdlib folder"
-                );
-            }
-        }
-    } else {
-        // download_tdlib();
-        None
-    }
-}
-
-#[cfg(not(any(feature = "docs", feature = "pkg-config")))]
-lazy_static! {
-    static ref BUILD_CONFIG: BuildConfig = {
-        #[cfg(any(
-            all(target_os = "linux", target_arch = "x86_64"),
-            all(target_os = "macos", target_arch = "x86_64"),
-            all(target_os = "macos", target_arch = "aarch64"),
-        ))]
-        {
-            let out_dir = env::var("OUT_DIR").unwrap();
-            let prefix = format!("{}/tdlib", out_dir);
-            let include_dir = format!("{}/include", prefix);
-            let lib_dir = format!("{}/lib", prefix);
-            let lib_path = {
-                #[cfg(all(target_os = "linux", target_arch = "x86_64"))]
-                {
-                    format!("{}/libtdjson.so.{}", lib_dir, TDLIB_VERSION)
-                }
-                #[cfg(any(
-                    all(target_os = "macos", target_arch = "x86_64"),
-                    all(target_os = "macos", target_arch = "aarch64")
-                ))]
-                {
-                    format!("{}/libtdjson.{}.dylib", lib_dir, TDLIB_VERSION)
-                }
-            };
-            let bin_dir = None;
-
-            BuildConfig {
-                include_dir,
-                lib_dir,
-                lib_path,
-                bin_dir,
-            }
-        }
-
-        #[cfg(all(target_os = "windows", target_arch = "x86_64"))]
-        {
-            let out_dir = env::var("OUT_DIR").unwrap();
-            let prefix = format!(r"{}\tdlib", out_dir);
-            let include_dir = format!(r"{}\include", prefix);
-            let lib_dir = format!(r"{}\lib", prefix);
-            let bin_dir = Some(format!(r"{}\bin", prefix));
-            let lib_path = format!(r"{}\tdjson.lib", lib_dir);
-
-            BuildConfig {
-                lib_dir,
-                bin_dir,
-                lib_path,
-            }
-        }
-    };
-}
 
 /// Load the type language definitions from a certain file.
 /// Parse errors will be printed to `stderr`, and only the
@@ -133,7 +40,7 @@ fn load_tl(file: &str) -> std::io::Result<Vec<Definition>> {
         .collect())
 }
 
-#[cfg(feature = "local-tdlib")]
+#[cfg(not(any(feature = "docs", feature = "pkg-config", feature = "download-tdlib")))]
 /// Copy all files from a directory to another.
 fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> std::io::Result<()> {
     std::fs::create_dir_all(&dst)?;
@@ -149,6 +56,21 @@ fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> std::io::Result
     Ok(())
 }
 
+#[cfg(not(any(feature = "docs", feature = "pkg-config", feature = "download-tdlib")))]
+/// Copy all the tdlib folder find in the LOCAL_TDLIB_PATH environment variable to the OUT_DIR/tdlib folder
+fn copy_local_tdlib() {
+    match env::var("LOCAL_TDLIB_PATH") {
+        Ok(tdlib_path) => {
+            let out_dir = env::var("OUT_DIR").unwrap();
+            let prefix = format!("{}/tdlib", out_dir);
+            copy_dir_all(Path::new(&tdlib_path), Path::new(&prefix)).unwrap();
+        }
+        Err(_) => {
+            panic!("The LOCAL_TDLIB_PATH env variable must be set to the path of the tdlib folder");
+        }
+    };
+}
+
 #[cfg(not(any(feature = "docs", feature = "pkg-config")))]
 /// Build the project using the generic build configuration.
 /// The current supported platforms are:
@@ -157,44 +79,50 @@ fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> std::io::Result
 /// - MacOS x86_64
 /// - MacOS aarch64
 fn generic_build() {
-    let build_config = &*BUILD_CONFIG;
-
-    #[cfg(feature = "local-tdlib")]
-    {
-        let tdlib_path = get_tdlib_path();
-        if let Some(tdlib_path) = tdlib_path {
-            /// The prefix where the tdlib will be copied. It is the concatenation of the out_dir and the `tdlib` folder name.
-            let prefix = format!("{}/tdlib", env::var("OUT_DIR").unwrap());
-            let _ = copy_dir_all(Path::new(&tdlib_path), Path::new(&prefix));
+    let out_dir = env::var("OUT_DIR").unwrap();
+    let prefix = format!("{}/tdlib", out_dir);
+    let include_dir = format!("{}/include", prefix);
+    let lib_dir = format!("{}/lib", prefix);
+    let lib_path = {
+        #[cfg(all(target_os = "linux", target_arch = "x86_64"))]
+        {
+            format!("{}/libtdjson.so.{}", lib_dir, TDLIB_VERSION)
         }
-    }
-    #[cfg(not(feature = "local-tdlib"))]
-    download_tdlib();
+        #[cfg(any(
+            all(target_os = "macos", target_arch = "x86_64"),
+            all(target_os = "macos", target_arch = "aarch64")
+        ))]
+        {
+            format!("{}/libtdjson.{}.dylib", lib_dir, TDLIB_VERSION)
+        }
+        #[cfg(all(target_os = "windows", target_arch = "x86_64"))]
+        {
+            format!(r"{}\tdjson.lib", lib_dir)
+        }
+    };
 
-    let lib_path = &build_config.lib_path;
     if !std::path::PathBuf::from(lib_path.clone()).exists() {
         panic!("tdjson shared library not found at {}", lib_path);
     }
 
-    let bin_dir = &build_config.bin_dir;
-    if let Some(bin_dir) = bin_dir {
+    #[cfg(all(target_os = "windows", target_arch = "x86_64"))]
+    {
+        let bin_dir = format!(r"{}\bin", prefix);
         println!("cargo:rustc-link-search=native={}", bin_dir);
     }
 
-    let lib_dir = &build_config.lib_dir;
     println!("cargo:rustc-link-search=native={}", lib_dir);
 
-    let include_dir = &build_config.include_dir;
     println!("cargo:include={}", include_dir);
 
     println!("cargo:rustc-link-lib=dylib=tdjson");
 }
 
-#[cfg(not(any(feature = "docs", feature = "pkg-config", feature = "local-tdlib")))]
+#[cfg(feature = "download-tdlib")]
 fn download_tdlib() {
     let base_url = "https://github.com/FedericoBruzzone/tdlib-rs/releases/download";
     // let url = format!(
-    //     "{}/v{}/TDLib-{}-{}-{}.zip",
+    //     "{}/v{}/tdlib-{}-{}-{}.zip",
     //     base_url,
     //     env!("CARGO_PKG_VERSION"),
     //     TDLIB_VERSION,
@@ -270,16 +198,16 @@ fn main() -> std::io::Result<()> {
     compile_error!(
         "feature \"docs\" and feature \"pkg-config\" cannot be enabled at the same time"
     );
-    #[cfg(all(feature = "docs", feature = "local-tdlib"))]
+    #[cfg(all(feature = "docs", feature = "download-tdlib"))]
     compile_error!(
-        "feature \"docs\" and feature \"local-tdlib\" cannot be enabled at the same time"
+        "feature \"docs\" and feature \"download-tdlib\" cannot be enabled at the same time"
     );
-    #[cfg(all(feature = "pkg-config", feature = "local-tdlib"))]
+    #[cfg(all(feature = "pkg-config", feature = "download-tdlib"))]
     compile_error!(
-        "feature \"pkg-config\" and feature \"local-tdlib\" cannot be enabled at the same time"
+        "feature \"pkg-config\" and feature \"download-tdlib\" cannot be enabled at the same time"
     );
 
-    #[cfg(feature = "local-tdlib")]
+    #[cfg(not(any(feature = "docs", feature = "pkg-config", feature = "download-tdlib")))]
     println!("cargo:rerun-if-env-changed=LOCAL_TDLIB_PATH");
 
     println!("cargo:rerun-if-changed=build.rs");
@@ -291,13 +219,15 @@ fn main() -> std::io::Result<()> {
         // - export PKG_CONFIG_PATH=$HOME/lib/tdlib/lib/pkgconfig/:$PKG_CONFIG_PATH
         // - export LD_LIBRARY_PATH=$HOME/lib/tdlib/lib/:$LD_LIBRARY_PATH
         #[cfg(feature = "pkg-config")]
-        {
-            system_deps::Config::new().probe().unwrap();
-        }
+        system_deps::Config::new().probe().unwrap();
+
+        #[cfg(feature = "download-tdlib")]
+        download_tdlib();
 
         #[cfg(not(feature = "pkg-config"))]
         {
-            lazy_static::initialize(&BUILD_CONFIG);
+            #[cfg(not(feature = "download-tdlib"))]
+            copy_local_tdlib();
             generic_build();
         }
     }

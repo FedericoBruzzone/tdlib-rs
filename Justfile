@@ -1,7 +1,7 @@
 # vim: set ft=make :
 set windows-powershell := true
 export RUST_BACKTRACE := "1"
-project_name := "tgt"
+project_name := "tdlib-rs"
 
 _default:
   just --list --justfile {{justfile()}}
@@ -23,13 +23,13 @@ run PACKAGE_FLAG="" PACKAGE_NAME="" BIN_FLAG="" BIN_NAME="":
 
 # Format the code using cargo
 fmt:
-  cargo fmt
-  cargo fmt -- --check
+  cargo fmt --all
+  cargo fmt --all -- --check
 
 # Format the code using cargo nightly
 fmt_nightly:
-  cargo +nightly fmt
-  cargo +nightly fmt -- --check
+  cargo +nightly fmt --all
+  cargo +nightly fmt --all -- --check
 
 # Run clippy using cargo
 clippy:

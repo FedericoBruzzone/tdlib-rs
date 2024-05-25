@@ -5,17 +5,17 @@ build:
 
 all: fmt clippy test build
 
-# Example: make run ARGS="--package tdlib-rs --bin get_me"
+# Example: make run ARGS="--package tdlib-rs --example get_me"
 run:
 	cargo run $(ARGS)
 
 fmt:
-	cargo fmt
-	cargo fmt -- --check
+	cargo fmt --all
+	cargo fmt --all -- --check
 
 fmt_nightly:
-	cargo +nightly fmt
-	cargo +nightly fmt -- --check
+	cargo +nightly fmt --all
+	cargo +nightly fmt --all -- --check
 
 clippy:
 	cargo clippy --all-targets -- -D warnings
