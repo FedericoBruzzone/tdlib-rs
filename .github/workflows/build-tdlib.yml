@@ -5,7 +5,8 @@ on:
   workflow_call:
 
 env:
-  TDLIB_VERSION: 2589c3fd46925f5d57e4ec79233cd1bd0f5d0c09
+  TDLIB_VERSION: "1.8.19"
+  TDLIB_COMMIT: 2589c3fd46925f5d57e4ec79233cd1bd0f5d0c09
 
 jobs:
   build-linux:
@@ -16,7 +17,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: td/
-          key: ${{ runner.os }}-${{ runner.arch }}-TDLib-${{ env.TDLIB_VERSION }}
+          key: tdlib-${{ env.TDLIB_VERSION }}-linux-x86_64
       - name: Build TDLib
         if: steps.cache-tdlib-restore.outputs.cache-hit != 'true'
         run: |
@@ -25,7 +26,7 @@ jobs:
           sudo apt-get -y install make git zlib1g-dev libssl-dev gperf php-cli cmake clang-14 libc++-dev libc++abi-dev
           git clone https://github.com/tdlib/td.git
           cd td
-          git checkout $TDLIB_VERSION
+          git checkout $TDLIB_COMMIT
           rm -rf build
           mkdir build
           cd build
@@ -58,7 +59,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: td/
-          key: ${{ runner.os }}-${{ runner.arch }}-TDLib-${{ env.TDLIB_VERSION }}
+          key: tdlib-${{ env.TDLIB_VERSION }}-macos-${{ runner.arch == 'ARM64' && 'aarch64' || 'x86_64' }}
       - name: Build TDLib
         if: steps.cache-tdlib-restore.outputs.cache-hit != 'true'
         run: |
@@ -66,7 +67,7 @@ jobs:
           brew install gperf cmake openssl
           git clone https://github.com/tdlib/td.git
           cd td
-          git checkout $TDLIB_VERSION
+          git checkout $TDLIB_COMMIT
           rm -rf build
           mkdir build
           cd build
@@ -93,13 +94,13 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: td/
-          key: ${{ runner.os }}-${{ runner.arch }}-TDLib-${{ env.TDLIB_VERSION }}
+          key: tdlib-${{ env.TDLIB_VERSION }}-windows-x86_64
       - name: Build TDLib
         if: steps.cache-tdlib-restore.outputs.cache-hit != 'true'
         run: |
           git clone https://github.com/tdlib/td.git
           cd td
-          git checkout $TDLIB_VERSION
+          git checkout $TDLIB_COMMIT
           git clone https://github.com/Microsoft/vcpkg.git
           cd vcpkg
           git checkout cd5e746ec203c8c3c61647e0886a8df8c1e78e41
