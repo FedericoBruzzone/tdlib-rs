@@ -43,7 +43,7 @@ impl FromStr for Type {
     /// # Examples
     ///
     /// ```
-    /// use tdlib_tl_parser::tl::Type;
+    /// use tdlib_rs_parser::tl::Type;
     ///
     /// assert!("vector<int>".parse::<Type>().is_ok());
     /// ```

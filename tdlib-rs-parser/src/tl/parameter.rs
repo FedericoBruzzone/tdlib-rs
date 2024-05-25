@@ -40,7 +40,7 @@ impl FromStr for Parameter {
     /// # Examples
     ///
     /// ```
-    /// use tdlib_tl_parser::tl::Parameter;
+    /// use tdlib_rs_parser::tl::Parameter;
     ///
     /// assert!("foo:Bar".parse::<Parameter>().is_ok());
     /// ```

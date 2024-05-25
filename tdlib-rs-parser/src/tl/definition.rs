@@ -55,7 +55,7 @@ impl FromStr for Definition {
     /// # Examples
     ///
     /// ```
-    /// use tdlib_tl_parser::tl::Definition;
+    /// use tdlib_rs_parser::tl::Definition;
     ///
     /// assert!("sendMessage chat_id:int message:string = Message".parse::<Definition>().is_ok());
     /// ```

@@ -37,11 +37,11 @@ struct BuildConfig {
     /// The lib directory where the tdlib shared libraries are placed.
     /// It is the concatenation of the prefix and the `lib` folder name.
     lib_dir: String,
+    /// The shared library file path.
+    lib_path: String,
     /// The bin directory where the tdlib binaries are placed.
     /// It is the concatenation of the prefix and the `bin` folder name.
     bin_dir: Option<String>,
-    /// The shared library file path.
-    lib_path: String,
 }
 
 #[cfg(not(any(feature = "docs", feature = "pkg-config", not(feature = "local-tdlib"))))]
@@ -64,30 +64,42 @@ fn get_tdlib_path() -> Option<String> {
 #[cfg(not(any(feature = "docs", feature = "pkg-config")))]
 lazy_static! {
     static ref BUILD_CONFIG: BuildConfig = {
-        #[cfg(all(target_os = "linux", target_arch = "x86_64"))]
+        #[cfg(any(
+            all(target_os = "linux", target_arch = "x86_64"),
+            all(target_os = "macos", target_arch = "x86_64"),
+            all(target_os = "macos", target_arch = "aarch64"),
+        ))]
         {
             let out_dir = env::var("OUT_DIR").unwrap();
-            // let tdlib_path = get_tdlib_path(); // "/home/fcb/lib/tdlib".to_string()
             let prefix = format!("{}/tdlib", out_dir);
             let include_dir = format!("{}/include", prefix);
             let lib_dir = format!("{}/lib", prefix);
+            let lib_path = {
+                #[cfg(all(target_os = "linux", target_arch = "x86_64"))]
+                {
+                    format!("{}/libtdjson.so.{}", lib_dir, TDLIB_VERSION)
+                }
+                #[cfg(any(
+                    all(target_os = "macos", target_arch = "x86_64"),
+                    all(target_os = "macos", target_arch = "aarch64")
+                ))]
+                {
+                    format!("{}/libtdjson.{}.dylib", lib_dir, TDLIB_VERSION)
+                }
+            };
             let bin_dir = None;
-            let lib_path = format!("{}/libtdjson.so.{}", lib_dir, TDLIB_VERSION);
 
             BuildConfig {
-                // tdlib_path,
-                // prefix,
                 include_dir,
                 lib_dir,
-                bin_dir,
                 lib_path,
+                bin_dir,
             }
         }
 
         #[cfg(all(target_os = "windows", target_arch = "x86_64"))]
         {
             let out_dir = env::var("OUT_DIR").unwrap();
-            // let tdlib_path = get_tdlib_path();// r"C:\Users\andre\Documents\tdlib\td\tdlib".to_string()
             let prefix = format!(r"{}\tdlib", out_dir);
             let include_dir = format!(r"{}\include", prefix);
             let lib_dir = format!(r"{}\lib", prefix);
@@ -95,49 +107,6 @@ lazy_static! {
             let lib_path = format!(r"{}\tdjson.lib", lib_dir);
 
             BuildConfig {
-                // tdlib_path,
-                // prefix,
-                include_dir,
-                lib_dir,
-                bin_dir,
-                lib_path,
-            }
-        }
-
-        #[cfg(all(target_os = "macos", target_arch = "x86_64"))]
-        {
-            let out_dir = env::var("OUT_DIR").unwrap();
-            // let tdlib_path = get_tdlib_path();// "/Users/federicobruzzone/lib/tdlib".to_string()
-            let prefix = format!("{}/tdlib", out_dir);
-            let include_dir = format!("{}/include", prefix);
-            let lib_dir = format!("{}/lib", prefix);
-            let bin_dir = None;
-            let lib_path = format!("{}/libtdjson.{}.dylib", lib_dir, TDLIB_VERSION);
-
-            BuildConfig {
-                // tdlib_path,
-                // prefix,
-                include_dir,
-                lib_dir,
-                bin_dir,
-                lib_path,
-            }
-        }
-
-        #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
-        {
-            let out_dir = env::var("OUT_DIR").unwrap();
-            // let tdlib_path = get_tdlib_path(); //"/Users/federicobruzzone/lib/tdlib";
-            let prefix = format!("{}/tdlib", out_dir);
-            let include_dir = format!("{}/include", prefix);
-            let lib_dir = format!("{}/lib", prefix);
-            let bin_dir = None;
-            let lib_path = format!("{}/libtdjson.{}.dylib", lib_dir, TDLIB_VERSION);
-
-            BuildConfig {
-                // tdlib_path,
-                // prefix,
-                include_dir,
                 lib_dir,
                 bin_dir,
                 lib_path,
