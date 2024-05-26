@@ -121,35 +121,34 @@ fn generic_build() {
 #[cfg(feature = "download-tdlib")]
 fn download_tdlib() {
     let base_url = "https://github.com/FedericoBruzzone/tdlib-rs/releases/download";
-    // let url = format!(
-    //     "{}/v{}/tdlib-{}-{}-{}.zip",
-    //     base_url,
-    //     env!("CARGO_PKG_VERSION"),
-    //     TDLIB_VERSION,
-    //     std::env::var("CARGO_CFG_TARGET_OS").unwrap(),
-    //     std::env::var("CARGO_CFG_TARGET_ARCH").unwrap(),
-    // );
-    let target_os = if cfg!(target_os = "windows") {
-        "Windows"
-    } else if cfg!(target_os = "linux") {
-        "Linux"
-    } else if cfg!(target_os = "macos") {
-        "macOS"
-    } else {
-        ""
-    };
-    let target_arch = if cfg!(target_arch = "x86_64") {
-        "X64"
-    } else if cfg!(target_arch = "aarch64") {
-        "ARM64"
-    } else {
-        ""
-    };
-
     let url = format!(
-        "{}/test/{}-{}-TDLib-{}.zip",
-        base_url, target_os, target_arch, "2589c3fd46925f5d57e4ec79233cd1bd0f5d0c09"
+        "{}/v{}/tdlib-{}-{}-{}.zip",
+        base_url,
+        env!("CARGO_PKG_VERSION"),
+        TDLIB_VERSION,
+        std::env::var("CARGO_CFG_TARGET_OS").unwrap(),
+        std::env::var("CARGO_CFG_TARGET_ARCH").unwrap(),
     );
+    // let target_os = if cfg!(target_os = "windows") {
+    //     "Windows"
+    // } else if cfg!(target_os = "linux") {
+    //     "Linux"
+    // } else if cfg!(target_os = "macos") {
+    //     "macOS"
+    // } else {
+    //     ""
+    // };
+    // let target_arch = if cfg!(target_arch = "x86_64") {
+    //     "X64"
+    // } else if cfg!(target_arch = "aarch64") {
+    //     "ARM64"
+    // } else {
+    //     ""
+    // };
+    // let url = format!(
+    //     "{}/test/{}-{}-TDLib-{}.zip",
+    //     base_url, target_os, target_arch, "2589c3fd46925f5d57e4ec79233cd1bd0f5d0c09"
+    // );
 
     let out_dir = env::var("OUT_DIR").unwrap();
     let tdlib_dir = format!("{}/tdlib", &out_dir);

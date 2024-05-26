@@ -5,6 +5,8 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  release:
+    types: [ created, published ]
 
 env:
   GH_TOKEN: ${{ github.token }}
@@ -29,7 +31,7 @@ jobs:
       - name: Download TDLib
         if:  matrix.feature == 'default' || matrix.feature == 'pkg-config'
         run: |
-          gh release download test --pattern 'Linux*.zip'
+          gh release download --pattern 'tdlib-*-linux-x86_64.zip' # test
           unzip -q *.zip -d .
       - name: Set pkg-config environment variables
         if: matrix.feature == 'pkg-config'
