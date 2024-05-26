@@ -21,7 +21,7 @@ clippy:
 	cargo clippy --all-targets -- -D warnings
 
 test:
-	cargo test -- --nocapture --test-threads=1
+	cargo test --verbose --workspace --exclude tdlib-rs -- --nocapture --test-threads=1
 
 clean:
 	cargo clean

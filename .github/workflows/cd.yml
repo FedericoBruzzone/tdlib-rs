@@ -20,6 +20,7 @@ jobs:
       - name: Download artifacts
         run: gh run download ${{ github.run_id }} -R $REPO
       - name: Zip artifacts
-        run: find * -maxdepth 0 -type d -execdir mv '{}' tdlib \; -execdir zip -q -r -m -6 '{}.zip' 'tdlib' \;
+        run: find * -maxdepth 0 -type d -execdir mv '{}' tdlib \; -execdir zip -r -m -6 '{}.zip' 'tdlib' \;
       - name: Create release
-        run: gh release create ${{ github.ref_name }} -R $REPO --generate-notes --prerelease ./*.zip
+        run: gh release create ${{ github.ref_name }} -R $REPO --generate-notes ./*.zip
+      # cargo publish

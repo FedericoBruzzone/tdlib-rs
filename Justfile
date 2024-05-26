@@ -37,7 +37,7 @@ clippy:
 
 # Run tests using cargo
 test:
-  cargo test -- --nocapture --test-threads=1
+  cargo test --verbose --workspace --exclude tdlib-rs -- --nocapture --test-threads=1
 
 # Clean the project using cargo
 clean:
