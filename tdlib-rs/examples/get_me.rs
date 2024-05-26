@@ -1,5 +1,5 @@
-// cargo run -p tdlib-rs --example get_me
-// cargo run -p tdlib-rs --example get_me --features local-tdlib
+// cargo run -p tdlib-rs --example get_me --features default
+// cargo run -p tdlib-rs --example get_me --features download-tdlib
 // cargo run -p tdlib-rs --example get_me --features pkg-config
 
 use std::sync::{

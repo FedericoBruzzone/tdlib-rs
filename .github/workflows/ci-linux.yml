@@ -33,7 +33,9 @@ jobs:
           unzip -q *.zip -d .
       - name: Set pkg-config environment variables
         if: matrix.feature == 'pkg-config'
-        run: echo "PKG_CONFIG_PATH=$(pwd)/tdlib/lib/pkgconfig" >> $GITHUB_ENV
+        run: |
+          echo "PKG_CONFIG_PATH=$(pwd)/tdlib/lib/pkgconfig" >> $GITHUB_ENV
+          echo "LD_LIBRARY_PATH=$(pwd)/tdlib/lib" >> $GITHUB_ENV
       - name: Set default environment variables
         if: matrix.feature == 'default'
         run: echo "LOCAL_TDLIB_PATH=$(pwd)/tdlib/" >> $GITHUB_ENV
@@ -45,3 +47,6 @@ jobs:
         run: cargo clippy --features ${{ matrix.feature }} -- -D warnings
       - name: Run cargo fmt
         run: cargo fmt --all -- --check
+      - name: Run cargo run
+        if: matrix.feature != 'docs'
+        run: cargo run --package tdlib-rs --example test_ci --features ${{ matrix.feature }}
