@@ -13,8 +13,25 @@ env:
 jobs:
   build-tdlib:
     uses: ./.github/workflows/build-tdlib.yml
-  release:
+
+  ci:
     runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Print pwd
+        run: pwd
+      - name: Print ls
+        run: ls
+      - name: Publish to crates.io
+        run: |
+          cargo login ${{ secrets.CRATES_IO_TOKEN }}
+          cargo publish --package tdlib-rs-parser
+          cargo publish --package tdlib-rs-gen
+          cargo publish --no-verify --package tdlib-rs
+
+  release:
+    runs-on: ubuntu-late st
     needs: build-tdlib
     steps:
       - name: Download artifacts
@@ -23,9 +40,3 @@ jobs:
         run: find * -maxdepth 0 -type d -execdir mv '{}' tdlib \; -execdir zip -r -m -6 '{}.zip' 'tdlib' \;
       - name: Create release
         run: gh release create ${{ github.ref_name }} -R $REPO --generate-notes ./*.zip
-      - name: Publish to crates.io
-        run: |
-          cargo login ${{ secrets.CRATES_IO_TOKEN }}
-          cargo publish --package tdlib-rs-gen --manifest-path tdlib-rs-gen/Cargo.toml
-          cargo publish --package tdlib-rs-parser --manifest-path tdlib-rs-parser/Cargo.toml
-          cargo publish --package tdlib-rs --manifest-path tdlib-rs/Cargo.toml
