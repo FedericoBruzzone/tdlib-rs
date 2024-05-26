@@ -2,7 +2,7 @@ name: CD
 
 on:
   push:
-    tags: 
+    tags:
       # - "v[0-9]+.[0-9]+.[0-9]+"
       - "*"
 
@@ -23,4 +23,9 @@ jobs:
         run: find * -maxdepth 0 -type d -execdir mv '{}' tdlib \; -execdir zip -r -m -6 '{}.zip' 'tdlib' \;
       - name: Create release
         run: gh release create ${{ github.ref_name }} -R $REPO --generate-notes ./*.zip
-      # cargo publish
+      - name: Publish to crates.io
+        run:
+          cargo login ${{ secrets.CRATES_IO_TOKEN }}
+          cargo publish --package tdlib-rs-gen --manifest-path tdlib-rs-gen/Cargo.toml
+          cargo publish --package tdlib-rs-parser --manifest-path tdlib-rs-parser/Cargo.toml
+          cargo publish --package tdlib-rs --manifest-path tdlib-rs/Cargo.toml

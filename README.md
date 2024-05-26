@@ -10,9 +10,10 @@ A Rust wrapper around the Telegram Database library. It includes a generator to 
 
 This is an improved version of the [tdlib-rs](https://github.com/paper-plane-developers/tdlib-rs) library, with the following additional features:
 
-1. It is cross-platform, it should work on Windows, Linux and MacOS.
+1. It is cross-platform, it works on Windows, Linux and MacOS.
 2. Not required `pkg-config` to build the library and associated exported variables.
 3. Not required `tdlib` to be compiled and installed on the system.
+4. It is possible to download the `tdlib` library from the GitHub releases.
 
 ## Information
 
