@@ -7,7 +7,7 @@ use std::sync::{
     Arc,
 };
 use tdlib_rs::{
-    enums::{AuthorizationState, Update, User},
+    enums::{self, AuthorizationState, Update, User},
     functions,
 };
 use tokio::sync::mpsc::{self, Receiver, Sender};
@@ -67,6 +67,36 @@ async fn handle_authorization_state(
                     Err(e) => println!("{}", e.message),
                 }
             },
+            AuthorizationState::WaitOtherDeviceConfirmation(x) => {
+                println!(
+                    "Please confirm this login link on another device: {}",
+                    x.link
+                );
+            }
+            AuthorizationState::WaitEmailAddress(_x) => {
+                let email_address = ask_user("Please enter email address: ");
+                let response =
+                    functions::set_authentication_email_address(email_address, client_id).await;
+                match response {
+                    Ok(_) => break,
+                    Err(e) => println!("{}", e.message),
+                }
+            }
+            AuthorizationState::WaitEmailCode(_x) => {
+                let code = ask_user("Please enter email authentication code: ");
+                let response = functions::check_authentication_email_code(
+                    enums::EmailAddressAuthentication::Code(
+                        tdlib_rs::types::EmailAddressAuthenticationCode { code },
+                    ),
+                    client_id,
+                )
+                .await;
+                match response {
+                    Ok(_) => break,
+                    Err(e) => println!("{}", e.message),
+                }
+            }
+
             AuthorizationState::WaitCode(_) => loop {
                 let input = ask_user("Enter the verification code:");
                 let response = functions::check_authentication_code(input, client_id).await;
@@ -75,6 +105,20 @@ async fn handle_authorization_state(
                     Err(e) => println!("{}", e.message),
                 }
             },
+            AuthorizationState::WaitRegistration(_x) => {
+                // x useless but contains the TOS if we want to show it
+                let first_name = ask_user("Please enter your first name: ");
+                let last_name = ask_user("Please enter your last name: ");
+                functions::register_user(first_name, last_name, client_id)
+                    .await
+                    .unwrap();
+            }
+            AuthorizationState::WaitPassword(_x) => {
+                let password = ask_user("Please enter password: ");
+                functions::check_authentication_password(password, client_id)
+                    .await
+                    .unwrap();
+            }
             AuthorizationState::Ready => {
                 break;
             }
