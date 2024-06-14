@@ -13,6 +13,7 @@ use std::env;
 use std::fs::File;
 use std::io::{BufWriter, Read, Write};
 use std::path::Path;
+
 use tdlib_rs_gen::generate_rust_code;
 use tdlib_rs_parser::parse_tl_file;
 use tdlib_rs_parser::tl::Definition;
@@ -79,6 +80,8 @@ fn copy_local_tdlib() {
 /// - MacOS x86_64
 /// - MacOS aarch64
 fn generic_build() {
+    // export LOCAL_TDLIB_PATH=$HOME/path/to/td/example/web/build/wasm/
+    let web_compiled_td = env::var("LOCAL_TDLIB_PATH").unwrap();
     let out_dir = env::var("OUT_DIR").unwrap();
     let prefix = format!("{}/tdlib", out_dir);
     let include_dir = format!("{}/include", prefix);
@@ -93,7 +96,8 @@ fn generic_build() {
             all(target_os = "macos", target_arch = "aarch64")
         ))]
         {
-            format!("{}/libtdjson.{}.dylib", lib_dir, TDLIB_VERSION)
+            // format!("{}/libtdjson.{}.dylib", lib_dir, TDLIB_VERSION)
+            format!("{}/libtdjson_static.a", web_compiled_td)
         }
         #[cfg(all(target_os = "windows", target_arch = "x86_64"))]
         {
@@ -110,12 +114,12 @@ fn generic_build() {
         let bin_dir = format!(r"{}\bin", prefix);
         println!("cargo:rustc-link-search=native={}", bin_dir);
     }
-
-    println!("cargo:rustc-link-search=native={}", lib_dir);
+    println!("cargo:rustc-link-search=native={}", web_compiled_td);
 
     println!("cargo:include={}", include_dir);
 
-    println!("cargo:rustc-link-lib=dylib=tdjson");
+    // println!("cargo:rustc-link-lib=dylib=tdjson");
+    println!("cargo:rustc-link-lib=static=tdjson_static");
 }
 
 #[cfg(feature = "download-tdlib")]

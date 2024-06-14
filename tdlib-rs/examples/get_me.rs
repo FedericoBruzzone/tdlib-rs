@@ -135,7 +135,7 @@ async fn handle_authorization_state(
     auth_rx
 }
 
-#[tokio::main]
+#[tokio::main(flavor="current_thread")]
 async fn main() {
     // Create the client object
     let client_id = tdlib_rs::create_client();
