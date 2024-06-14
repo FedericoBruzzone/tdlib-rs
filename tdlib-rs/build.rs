@@ -20,7 +20,7 @@ use tdlib_rs_parser::tl::Definition;
 #[allow(dead_code)]
 #[cfg(not(any(feature = "docs", feature = "pkg-config")))]
 /// The version of the TDLib library.
-const TDLIB_VERSION: &str = "1.8.19";
+const TDLIB_VERSION: &str = "1.8.29";
 
 /// Load the type language definitions from a certain file.
 /// Parse errors will be printed to `stderr`, and only the

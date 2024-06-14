@@ -5,6 +5,7 @@
 [![CI macOS](https://github.com/FedericoBruzzone/tdlib-rs/actions/workflows/ci-macos.yml/badge.svg)](https://github.com/FedericoBruzzone/tdlib-rs/actions/workflows/ci-macos.yml)
 
 A Rust wrapper around the Telegram Database library. It includes a generator to automatically generate the types and functions from the TDLib's [Type Language](https://core.telegram.org/mtproto/TL) file.
+Current version `v1.0.3`.
 
 ## Why this fork?
 
@@ -28,13 +29,13 @@ We compile it in the CI and we upload the artifacts to the GitHub releases, so w
 
 It's mainly created for using it in the [tgt](https://github.com/FedericoBruzzone/tgt) client, but it should work also for any other Rust project.
 
-Current supported TDLib version: [1.8.19](https://github.com/tdlib/td/commit/2589c3fd46925f5d57e4ec79233cd1bd0f5d0c09).
+Current supported TDLib version: [1.8.29](https://github.com/tdlib/td/commit/af69dd4397b6dc1bf23ba0fd0bf429fcba6454f6).
 
 ## Cargo features
 
 ### default
 
-By default the library require you to have the `tdlib` (version 1.8.19) compiled and installed on your system, and the following variables exported, for example in the `.bashrc` file:
+By default the library require you to have the `tdlib` (version 1.8.29) compiled and installed on your system, and the following variables exported, for example in the `.bashrc` file:
 
 ```sh
 # The path to the tdlib folder
@@ -65,7 +66,7 @@ If you want to use the `pkg-config` to build this library, you should enable the
 tdlib = { version = "1.0.0", features = [ "pkg-config" ] }
 ```
 
-remember to have the `tdlib` (version 1.8.19) installed on your system, and the following variables exported, for example in the `.bashrc` file:
+remember to have the `tdlib` (version 1.8.29) installed on your system, and the following variables exported, for example in the `.bashrc` file:
 
 ```sh
 # pkg-config configuration
