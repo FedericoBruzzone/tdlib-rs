@@ -10,6 +10,7 @@
 mod generated;
 mod observer;
 mod tdjson;
+pub mod build;
 
 pub use generated::{enums, functions, types};
 
