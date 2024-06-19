@@ -40,7 +40,7 @@ fn load_tl(file: &str) -> std::io::Result<Vec<Definition>> {
         .collect())
 }
 
-    #[cfg(not(any(feature = "docs", feature = "pkg-config", feature = "download-tdlib")))]
+#[cfg(not(any(feature = "docs", feature = "pkg-config", feature = "download-tdlib")))]
 /// Copy all files from a directory to another.
 fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> std::io::Result<()> {
     std::fs::create_dir_all(&dst)?;
@@ -206,43 +206,43 @@ fn download_tdlib() {
 }
 
 fn main() -> std::io::Result<()> {
-    #[cfg(all(feature = "docs", feature = "pkg-config"))]
-    compile_error!(
-        "feature \"docs\" and feature \"pkg-config\" cannot be enabled at the same time"
-    );
-    #[cfg(all(feature = "docs", feature = "download-tdlib"))]
-    compile_error!(
-        "feature \"docs\" and feature \"download-tdlib\" cannot be enabled at the same time"
-    );
-    #[cfg(all(feature = "pkg-config", feature = "download-tdlib"))]
-    compile_error!(
-        "feature \"pkg-config\" and feature \"download-tdlib\" cannot be enabled at the same time"
-    );
-
-    #[cfg(not(any(feature = "docs", feature = "pkg-config", feature = "download-tdlib")))]
-    println!("cargo:rerun-if-env-changed=LOCAL_TDLIB_PATH");
-
-    println!("cargo:rerun-if-changed=build.rs");
-
-    // Prevent linking libraries to avoid documentation failure
-    #[cfg(not(feature = "docs"))]
-    {
-        // It requires the following variables to be set:
-        // - export PKG_CONFIG_PATH=$HOME/lib/tdlib/lib/pkgconfig/:$PKG_CONFIG_PATH
-        // - export LD_LIBRARY_PATH=$HOME/lib/tdlib/lib/:$LD_LIBRARY_PATH
-        #[cfg(feature = "pkg-config")]
-        system_deps::Config::new().probe().unwrap();
-
-        #[cfg(feature = "download-tdlib")]
-        download_tdlib();
-
-        #[cfg(not(feature = "pkg-config"))]
-        {
-            #[cfg(not(feature = "download-tdlib"))]
-            copy_local_tdlib();
-            generic_build();
-        }
-    }
+    // #[cfg(all(feature = "docs", feature = "pkg-config"))]
+    // compile_error!(
+    //     "feature \"docs\" and feature \"pkg-config\" cannot be enabled at the same time"
+    // );
+    // #[cfg(all(feature = "docs", feature = "download-tdlib"))]
+    // compile_error!(
+    //     "feature \"docs\" and feature \"download-tdlib\" cannot be enabled at the same time"
+    // );
+    // #[cfg(all(feature = "pkg-config", feature = "download-tdlib"))]
+    // compile_error!(
+    //     "feature \"pkg-config\" and feature \"download-tdlib\" cannot be enabled at the same time"
+    // );
+    //
+    // #[cfg(not(any(feature = "docs", feature = "pkg-config", feature = "download-tdlib")))]
+    // println!("cargo:rerun-if-env-changed=LOCAL_TDLIB_PATH");
+    //
+    // println!("cargo:rerun-if-changed=build.rs");
+    //
+    // // Prevent linking libraries to avoid documentation failure
+    // #[cfg(not(feature = "docs"))]
+    // {
+    //     // It requires the following variables to be set:
+    //     // - export PKG_CONFIG_PATH=$HOME/lib/tdlib/lib/pkgconfig/:$PKG_CONFIG_PATH
+    //     // - export LD_LIBRARY_PATH=$HOME/lib/tdlib/lib/:$LD_LIBRARY_PATH
+    //     #[cfg(feature = "pkg-config")]
+    //     system_deps::Config::new().probe().unwrap();
+    //
+    //     #[cfg(feature = "download-tdlib")]
+    //     download_tdlib();
+    //
+    //     #[cfg(not(feature = "pkg-config"))]
+    //     {
+    //         #[cfg(not(feature = "download-tdlib"))]
+    //         copy_local_tdlib();
+    //         generic_build();
+    //     }
+    // }
 
     let out_dir = env::var("OUT_DIR").unwrap();
 

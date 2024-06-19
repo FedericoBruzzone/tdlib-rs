@@ -125,11 +125,7 @@ impl FromStr for Definition {
         }
 
         // Parse `description`
-        let description = if let Some(description) = docs.remove("description") {
-            description
-        } else {
-            String::new()
-        };
+        let description = docs.remove("description").unwrap_or_default();
 
         // Parse `middle`
         let params = middle
