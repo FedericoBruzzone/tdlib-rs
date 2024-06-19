@@ -40,7 +40,7 @@ fn load_tl(file: &str) -> std::io::Result<Vec<Definition>> {
         .collect())
 }
 
-#[cfg(not(any(feature = "docs", feature = "pkg-config", feature = "download-tdlib")))]
+    #[cfg(not(any(feature = "docs", feature = "pkg-config", feature = "download-tdlib")))]
 /// Copy all files from a directory to another.
 fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> std::io::Result<()> {
     std::fs::create_dir_all(&dst)?;
@@ -112,10 +112,9 @@ fn generic_build() {
     }
 
     println!("cargo:rustc-link-search=native={}", lib_dir);
-
     println!("cargo:include={}", include_dir);
-
     println!("cargo:rustc-link-lib=dylib=tdjson");
+    println!("cargo:rustc-link-arg=-Wl,-rpath,{}", lib_dir);
 }
 
 #[cfg(feature = "download-tdlib")]
