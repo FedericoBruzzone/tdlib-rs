@@ -7,10 +7,10 @@
 // <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
+pub mod build;
 mod generated;
 mod observer;
 mod tdjson;
-pub mod build;
 
 pub use generated::{enums, functions, types};
 

@@ -48,8 +48,6 @@ async fn handle_authorization_state(
                     "Desktop".into(),
                     String::new(),
                     env!("CARGO_PKG_VERSION").into(),
-                    false,
-                    true,
                     client_id,
                 )
                 .await;
@@ -109,7 +107,7 @@ async fn handle_authorization_state(
                 // x useless but contains the TOS if we want to show it
                 let first_name = ask_user("Please enter your first name: ");
                 let last_name = ask_user("Please enter your last name: ");
-                functions::register_user(first_name, last_name, client_id)
+                functions::register_user(first_name, last_name, false, client_id)
                     .await
                     .unwrap();
             }
