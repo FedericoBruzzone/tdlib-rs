@@ -7,8 +7,6 @@
 // <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
-// #[cfg(not(any(feature = "docs", feature = "pkg-config")))]
-// use lazy_static::lazy_static;
 use std::env;
 use std::fs::File;
 use std::io::{BufWriter, Read, Write};
@@ -40,7 +38,7 @@ fn load_tl(file: &str) -> std::io::Result<Vec<Definition>> {
         .collect())
 }
 
-#[cfg(not(any(feature = "docs", feature = "pkg-config", feature = "download-tdlib")))]
+#[cfg(feature = "local-tdlib")]
 /// Copy all files from a directory to another.
 fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> std::io::Result<()> {
     std::fs::create_dir_all(&dst)?;
@@ -56,7 +54,7 @@ fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> std::io::Result
     Ok(())
 }
 
-#[cfg(not(any(feature = "docs", feature = "pkg-config", feature = "download-tdlib")))]
+#[cfg(feature = "local-tdlib")]
 /// Copy all the tdlib folder find in the LOCAL_TDLIB_PATH environment variable to the OUT_DIR/tdlib folder
 fn copy_local_tdlib() {
     match env::var("LOCAL_TDLIB_PATH") {
@@ -71,7 +69,7 @@ fn copy_local_tdlib() {
     };
 }
 
-#[cfg(not(any(feature = "docs", feature = "pkg-config")))]
+#[cfg(any(feature = "download-tdlib", feature = "local-tdlib"))]
 /// Build the project using the generic build configuration.
 /// The current supported platforms are:
 /// - Linux x86_64
@@ -206,6 +204,14 @@ fn download_tdlib() {
 }
 
 fn main() -> std::io::Result<()> {
+    // #[cfg(not(any(
+    //     feature = "docs",
+    //     feature = "local-tdlib",
+    //     feature = "pkg-config",
+    //     feature = "download-tdlib"
+    // )))]
+    // println!("cargo:warning=No features enabled, you must enable at least one of the following features: docs, local-tdlib, pkg-config, download-tdlib");
+
     #[cfg(all(feature = "docs", feature = "pkg-config"))]
     compile_error!(
         "feature \"docs\" and feature \"pkg-config\" cannot be enabled at the same time"
@@ -219,10 +225,10 @@ fn main() -> std::io::Result<()> {
         "feature \"pkg-config\" and feature \"download-tdlib\" cannot be enabled at the same time"
     );
 
-    #[cfg(not(any(feature = "docs", feature = "pkg-config", feature = "download-tdlib")))]
-    println!("cargo:rerun-if-env-changed=LOCAL_TDLIB_PATH");
-
     println!("cargo:rerun-if-changed=build.rs");
+
+    #[cfg(feature = "local-tdlib")]
+    println!("cargo:rerun-if-env-changed=LOCAL_TDLIB_PATH");
 
     // Prevent linking libraries to avoid documentation failure
     #[cfg(not(feature = "docs"))]
@@ -236,12 +242,11 @@ fn main() -> std::io::Result<()> {
         #[cfg(feature = "download-tdlib")]
         download_tdlib();
 
-        #[cfg(not(feature = "pkg-config"))]
-        {
-            #[cfg(not(feature = "download-tdlib"))]
-            copy_local_tdlib();
-            generic_build();
-        }
+        #[cfg(feature = "local-tdlib")]
+        copy_local_tdlib();
+
+        #[cfg(any(feature = "download-tdlib", feature = "local-tdlib"))]
+        generic_build();
     }
 
     let out_dir = env::var("OUT_DIR").unwrap();

@@ -27,6 +27,8 @@ default = []
 bots-only-api = []
 # This feature is used to build the documentation preventing linking to the tdjson library
 docs = []
+# This feature is used to build the library using the tdlib library installed in the system
+local-tdlib = []
 # This feature is used to build the library using pkg-config
 pkg-config = ["dep:system-deps"]
 # This feature is used to build the library using the tdlib library downloaded from github

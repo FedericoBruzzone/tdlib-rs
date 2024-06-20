@@ -21,7 +21,7 @@ pub fn check_features() {
 }
 
 pub fn set_rerun_if() {
-    #[cfg(not(any(feature = "docs", feature = "pkg-config", feature = "download-tdlib")))]
+    #[cfg(feature = "local-tdlib")]
     println!("cargo:rerun-if-env-changed=LOCAL_TDLIB_PATH");
 
     println!("cargo:rerun-if-changed=build.rs");
@@ -29,6 +29,7 @@ pub fn set_rerun_if() {
 
 // You have to build the tdlib
 // TODO: Try to change the .pc file
+#[cfg(feature = "pkg-config")]
 pub fn build_pkg_config() {
     #[cfg(not(feature = "docs"))]
     {
@@ -149,7 +150,7 @@ fn copy_dir_all(
     Ok(())
 }
 
-#[cfg(not(any(feature = "docs", feature = "pkg-config")))]
+#[cfg(any(feature = "download-tdlib", feature = "local-tdlib"))]
 /// Build the project using the generic build configuration.
 /// The current supported platforms are:
 /// - Linux x86_64
@@ -238,7 +239,7 @@ pub fn build_download_tdlib(dest_path: Option<String>) {
 //     };
 // }
 
-#[cfg(not(any(feature = "docs", feature = "pkg-config", feature = "download-tdlib")))]
+#[cfg(feature = "local-tdlib")]
 pub fn build_local_tdlib() {
     // copy_local_tdlib();
     let path = std::env::var("LOCAL_TDLIB_PATH").unwrap();

@@ -24,7 +24,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-13, macos-14]
-        feature: [default, download-tdlib, pkg-config, docs]
+        feature: [local-tdlib, download-tdlib, pkg-config, docs]
 
     runs-on: ${{ matrix.os }}
 
@@ -32,7 +32,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Download TDLib
-        if:  matrix.feature == 'default' || matrix.feature == 'pkg-config'
+        if:  matrix.feature == 'local-tdlib' || matrix.feature == 'pkg-config'
         run: |
           gh release download --pattern ${{ runner.arch == 'ARM64' && 'tdlib-*-macos-aarch64.zip' || 'tdlib-*-macos-x86_64.zip' }}
           unzip -q *.zip -d .
@@ -41,8 +41,8 @@ jobs:
         run: |
           echo "PKG_CONFIG_PATH=$(pwd)/tdlib/lib/pkgconfig" >> $GITHUB_ENV
           echo "DYLD_LIBRARY_PATH=$(pwd)/tdlib/lib" >> $GITHUB_ENV
-      - name: Set default environment variables
-        if: matrix.feature == 'default'
+      - name: Set local-tdlib environment variables
+        if: matrix.feature == 'local-tdlib'
         run: echo "LOCAL_TDLIB_PATH=$(pwd)/tdlib/" >> $GITHUB_ENV
       - name: Run cargo build
         run: cargo build --verbose --features ${{ matrix.feature }}
