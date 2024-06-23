@@ -48,7 +48,7 @@ jobs:
       - name: Run cargo test
         run: cargo test --verbose --workspace --exclude tdlib-rs -- --nocapture --test-threads=1
       - name: Run cargo clippy
-        run: cargo clippy --features ${{ matrix.feature }} -- -D warnings
+        run: cargo clippy --all-targets --features ${{ matrix.feature }} -- -D warnings
       - name: Run cargo fmt
         run: cargo fmt --all -- --check
       - name: Run cargo run

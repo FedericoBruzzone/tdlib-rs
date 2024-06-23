@@ -3,7 +3,6 @@
 /// - `local-tdlib`
 /// - `pkg-config`
 /// - `download-tdlib`
-///
 
 #[allow(dead_code)]
 #[cfg(not(any(feature = "docs", feature = "pkg-config")))]
@@ -249,6 +248,7 @@ pub fn set_rerun_if() {
 }
 
 #[cfg(feature = "pkg-config")]
+#[allow(clippy::needless_doctest_main)]
 /// Build the project using the `pkg-config` feature.
 /// Using the `pkg-config` feature, the function will probe the system dependencies.
 /// It means that the function assumes that the tdlib library is compiled in the system.
@@ -258,19 +258,21 @@ pub fn set_rerun_if() {
 /// If the variables are not set, the function will panic.
 ///
 /// # Example
+/// Cargo.toml:
 /// ```toml
-/// // Cargo.toml
 /// [dependencies]
 /// tdlib = { version = "...", features = ["pkg-config"] }
 /// ```
+///
+/// build.rs:
 /// ```rust
-/// // build.rs
 /// fn main() {
 ///   tdlib_rs::build::check_features();
 ///   tdlib_rs::build::set_rerun_if();
 ///   tdlib_rs::build::build_pkg_config();
 ///   // Other build configurations
 ///   // ...
+/// }
 /// ```
 pub fn build_pkg_config() {
     #[cfg(not(feature = "docs"))]
@@ -280,6 +282,7 @@ pub fn build_pkg_config() {
 }
 
 #[cfg(feature = "download-tdlib")]
+#[allow(clippy::needless_doctest_main)]
 /// Build the project using the `download-tdlib` feature.
 ///
 /// # Arguments
@@ -303,23 +306,24 @@ pub fn build_pkg_config() {
 /// If the OS or architecture is not supported, the function will panic.
 ///
 /// # Example
+/// Cargo.toml:
 /// ```toml
-/// // Cargo.toml
 /// [dependencies]
 /// tdlib = { version = "...", features = ["download-tdlib"] }
 ///
-//// [build-dependencies]
+/// [build-dependencies]
 /// tdlib = { version = "...", features = [ "download-tdlib" ] }
 /// ```
 ///
+/// build.rs:
 /// ```rust
-/// // build.rs
 /// fn main() {
 ///   tdlib_rs::build::check_features();
 ///   tdlib_rs::build::set_rerun_if();
 ///   tdlib_rs::build::build_download_tdlib(None);
 ///   // Other build configurations
 ///   // ...
+/// }
 /// ```
 pub fn build_download_tdlib(dest_path: Option<String>) {
     #[cfg(not(feature = "docs"))]
@@ -340,6 +344,7 @@ pub fn build_download_tdlib(dest_path: Option<String>) {
 }
 
 #[cfg(feature = "local-tdlib")]
+#[allow(clippy::needless_doctest_main)]
 /// Build the project using the `local-tdlib` feature.
 /// Using the `local-tdlib` feature, the function will copy the tdlib library from the
 /// `LOCAL_TDLIB_PATH` environment variable.
@@ -357,8 +362,8 @@ pub fn build_download_tdlib(dest_path: Option<String>) {
 /// If the `LOCAL_TDLIB_PATH` environment variable is not set, the function will panic.
 ///
 /// # Example
+/// Cargo.toml:
 /// ```toml
-/// // Cargo.toml
 /// [dependencies]
 /// tdlib = { version = "...", features = ["local-tdlib"] }
 ///
@@ -366,8 +371,8 @@ pub fn build_download_tdlib(dest_path: Option<String>) {
 /// tdlib = { version = "...", features = [ "download-tdlib" ] }
 /// ```
 ///
+/// build.rs:
 /// ```rust
-/// // build.rs
 /// fn main() {
 ///   tdlib_rs::build::check_features();
 ///   tdlib_rs::build::set_rerun_if();
@@ -385,6 +390,7 @@ pub fn build_local_tdlib() {
     }
 }
 
+#[allow(clippy::needless_doctest_main)]
 /// Build the project using the enabled features.
 ///
 /// # Arguments
@@ -398,8 +404,8 @@ pub fn build_local_tdlib() {
 /// The function will build the project using the enabled feature.
 ///
 /// # Example
+/// Cargo.toml:
 /// ```toml
-/// // Cargo.toml
 /// [dependencies]
 /// tdlib = { version = "...", features = ["download-tdlib"] }
 ///
@@ -407,13 +413,14 @@ pub fn build_local_tdlib() {
 /// tdlib = { version = "...", features = [ "download-tdlib" ] }
 /// ```
 ///
+/// build.rs:
 /// ```rust
-/// // build.rs
 /// fn main() {
 ///   tdlib_rs::build::build(None);
 ///   // Other build configurations
 ///   // ...
 /// }
+/// ```
 pub fn build(_dest_path: Option<String>) {
     check_features();
     set_rerun_if();

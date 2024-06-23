@@ -204,7 +204,6 @@ fn download_tdlib() {
 }
 
 fn main() -> std::io::Result<()> {
-
     #[cfg(all(feature = "docs", feature = "pkg-config"))]
     compile_error!(
         "feature \"docs\" and feature \"pkg-config\" cannot be enabled at the same time"
@@ -243,8 +242,6 @@ fn main() -> std::io::Result<()> {
         #[cfg(any(feature = "download-tdlib", feature = "local-tdlib"))]
         generic_build();
     }
-
-
 
     let out_dir = env::var("OUT_DIR").unwrap();
 

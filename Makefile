@@ -1,12 +1,38 @@
 export RUST_BACKTRACE := 1
 
+# Usage: make <command> ARGS="--features <feature> --bin <bin_name>"
+#
+# Avaialble commands:
+#   all
+#   build
+#   run
+#   test
+#   clippy
+#   fmt
+#   clean
+#
+# Available features:
+#   local-tdlib
+#   download-tdlib
+#   pkg-config
+#
+# Available bin_name:
+#   get_me
 
-all: fmt clippy test build
+all:
+	$(MAKE) fmt
+	$(MAKE) clippy # ARGS="--features download-tdlib"
+	$(MAKE) test # ARGS="--features download-tdlib"
 
+build_local:
+	cargo build --no-default-features --features local-tdlib
+
+# Example 1: make build ARGS="--features download-tdlib"
+# Example 2: make build ARGS="--features download-tdlib --example telegram"
 build:
-    cargo build $(ARGS)
+	cargo build $(ARGS)
 
-# Example: make run ARGS="--package tdlib-rs --example get_me"
+# Example: make run ARGS="--package tdlib-rs --example get_me --features download-tdlib"
 run:
 	cargo run $(ARGS)
 
