@@ -1,11 +1,14 @@
 # tdlib-rs
 
+[![Latest version](https://img.shields.io/crates/v/tdlib_rs.svg)](https://crates.io/crates/tdlib_rs)
+[![Documentation](https://docs.rs/tdlib-rs/badge.svg)](https://docs.rs/tdlib-rs/latest/tdlib_rs/)
 [![CI Linux](https://github.com/FedericoBruzzone/tdlib-rs/actions/workflows/ci-linux.yml/badge.svg)](https://github.com/FedericoBruzzone/tdlib-rs/actions/workflows/ci-linux.yml)
 [![CI Windows](https://github.com/FedericoBruzzone/tdlib-rs/actions/workflows/ci-windows.yml/badge.svg)](https://github.com/FedericoBruzzone/tdlib-rs/actions/workflows/ci-windows.yml)
 [![CI macOS](https://github.com/FedericoBruzzone/tdlib-rs/actions/workflows/ci-macos.yml/badge.svg)](https://github.com/FedericoBruzzone/tdlib-rs/actions/workflows/ci-macos.yml)
+[![downloads](https://img.shields.io/crates/d/tdlib_rs)](https://crates.io/crates/tdlib_rs)
+![license](https://img.shields.io/crates/l/tdlib_rs)
 
 A Rust wrapper around the Telegram Database library. It includes a generator to automatically generate the types and functions from the TDLib's [Type Language](https://core.telegram.org/mtproto/TL) file.
-Current version `v1.0.3`.
 
 ## Why this fork?
 
@@ -33,18 +36,8 @@ Current supported TDLib version: [1.8.29](https://github.com/tdlib/td/commit/af6
 
 ## Cargo features
 
-### default
-
-By default the library require you to have the `tdlib` (version 1.8.29) compiled and installed on your system, and the following variables exported, for example in the `.bashrc` file:
-
-```sh
-# The path to the tdlib folder
-export LOCAL_TDLIB_PATH=$HOME/lib/tdlib
-```
-
-### bots-only-api
-
-This feature enable the generation of the functions only used by Telegram bots.
+Please see the documentation of the module `build` for more information about the features [here](https://docs.rs/tdlib-rs/latest/tdlib_rs/build/index.html).
+It functions that you can use to build the library in different ways.
 
 ### download-tdlib
 
@@ -52,10 +45,44 @@ If you don't want to compile and intall the `tdlib` on your system manually, you
 
 ```toml
 [dependencies]
-tdlib = { version = "1.0.0", features = [ "download-tdlib" ] }
+tdlib = { version = "...", features = [ "download-tdlib" ] }
+
+[build-dependencies]
+tdlib = { version = "...", features = [ "download-tdlib" ] }
 ```
 
-remember to check in the [information section](#information) if your platform is supported.
+```rust
+// build.rs
+fn main() {
+    tdlib_rs::build::build(None);
+}
+```
+
+### local-tdlib
+
+`local-tdlib` require you to have the `tdlib` (version 1.8.29) compiled and installed on your system, and the following variables exported, for example in the `.bashrc` file:
+
+```sh
+# The path to the tdlib folder
+export LOCAL_TDLIB_PATH=$HOME/lib/tdlib
+```
+
+Then you can enable the `local-tdlib` feature in the `Cargo.toml` file:
+
+```toml
+[dependencies]
+tdlib = { version = "...", features = [ "local-tdlib" ] }
+
+[build-dependencies]
+tdlib = { version = "...", features = [ "local-tdlib" ] }
+```
+
+```rust
+// build.rs
+fn main() {
+    tdlib_rs::build::build(None);
+}
+```
 
 ### pkg-config
 
@@ -63,10 +90,20 @@ If you want to use the `pkg-config` to build this library, you should enable the
 
 ```toml
 [dependencies]
-tdlib = { version = "1.0.0", features = [ "pkg-config" ] }
+tdlib = { version = "...", features = [ "pkg-config" ] }
+
+[build-dependencies]
+tdlib = { version = "...", features = [ "pkg-config" ] }
 ```
 
-remember to have the `tdlib` (version 1.8.29) installed on your system, and the following variables exported, for example in the `.bashrc` file:
+```rust
+// build.rs
+fn main() {
+    tdlib_rs::build::build(None);
+}
+```
+
+remember to have the `tdlib` (version 1.8.29) compiled on your system, and the following variables exported, for example in the `.bashrc` file:
 
 ```sh
 # pkg-config configuration
@@ -80,6 +117,10 @@ export LD_LIBRARY_PATH=$HOME/lib/tdlib/lib/:$LD_LIBRARY_PATH
 
 This feature skip the linking of the library and only generate the code of `generated.rs`.
 Is used only for testing.
+
+### bots-only-api
+
+This feature enable the generation of the functions only used by Telegram bots.
 
 ## License
 

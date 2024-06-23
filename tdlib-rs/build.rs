@@ -204,13 +204,6 @@ fn download_tdlib() {
 }
 
 fn main() -> std::io::Result<()> {
-    // #[cfg(not(any(
-    //     feature = "docs",
-    //     feature = "local-tdlib",
-    //     feature = "pkg-config",
-    //     feature = "download-tdlib"
-    // )))]
-    // println!("cargo:warning=No features enabled, you must enable at least one of the following features: docs, local-tdlib, pkg-config, download-tdlib");
 
     #[cfg(all(feature = "docs", feature = "pkg-config"))]
     compile_error!(
@@ -242,12 +235,16 @@ fn main() -> std::io::Result<()> {
         #[cfg(feature = "download-tdlib")]
         download_tdlib();
 
+        // It requires the following variable to be set:
+        // - export LOCAL_TDLIB_PATH=$HOME/lib/tdlib
         #[cfg(feature = "local-tdlib")]
         copy_local_tdlib();
 
         #[cfg(any(feature = "download-tdlib", feature = "local-tdlib"))]
         generic_build();
     }
+
+
 
     let out_dir = env::var("OUT_DIR").unwrap();
 

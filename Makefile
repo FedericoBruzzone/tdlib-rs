@@ -1,9 +1,10 @@
 export RUST_BACKTRACE := 1
 
-build:
-	cargo build
 
 all: fmt clippy test build
+
+build:
+    cargo build $(ARGS)
 
 # Example: make run ARGS="--package tdlib-rs --example get_me"
 run:
