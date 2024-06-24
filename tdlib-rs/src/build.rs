@@ -247,7 +247,7 @@ pub fn set_rerun_if() {
     println!("cargo:rerun-if-changed=build.rs");
 }
 
-#[cfg(feature = "pkg-config")]
+#[cfg(any(feature = "pkg-config", feature = "docs"))]
 #[allow(clippy::needless_doctest_main)]
 /// Build the project using the `pkg-config` feature.
 /// Using the `pkg-config` feature, the function will probe the system dependencies.
@@ -281,8 +281,9 @@ pub fn build_pkg_config() {
     }
 }
 
-#[cfg(feature = "download-tdlib")]
+#[cfg(any(feature = "download-tdlib", feature = "docs"))]
 #[allow(clippy::needless_doctest_main)]
+#[allow(unused_variables)]
 /// Build the project using the `download-tdlib` feature.
 ///
 /// # Arguments
@@ -342,8 +343,7 @@ pub fn build_download_tdlib(dest_path: Option<String>) {
         generic_build(dest_path);
     }
 }
-
-#[cfg(feature = "local-tdlib")]
+#[cfg(any(feature = "local-tdlib", feature = "docs"))]
 #[allow(clippy::needless_doctest_main)]
 /// Build the project using the `local-tdlib` feature.
 /// Using the `local-tdlib` feature, the function will copy the tdlib library from the
