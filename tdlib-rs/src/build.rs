@@ -9,7 +9,7 @@
 // The version of the TDLib library.
 const TDLIB_VERSION: &str = "1.8.29";
 #[cfg(feature = "download-tdlib")]
-const TDLIB_CARGO_PKG_VERSION: &str = "1.0.4";
+const TDLIB_CARGO_PKG_VERSION: &str = "1.0.5";
 
 // WARNING: This function is not used in the current version of the library.
 // #[cfg(not(any(feature = "docs", feature = "pkg-config", feature = "download-tdlib")))]
