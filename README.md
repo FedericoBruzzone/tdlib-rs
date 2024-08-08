@@ -140,11 +140,9 @@ Please review the license file provided in the repository for more information r
 
 ## Contact
 
-- Email:
-  - [federico.bruzzone.i@gmail.com]
-  - [federico.bruzzone@studenti.unimi.it]
-  - [andrea.longoni3@studenti.unimi.it]
-- GitHub:
+If you have any questions, suggestions, or feedback, do not hesitate to [contact me](https://federicobruzzone.github.io/).
+
+Mantainers:
   - [FedericoBruzzone](https://github.com/FedericoBruzzone)
   - [Andreal2000](https://github.com/Andreal2000)
 
