@@ -6,7 +6,7 @@
 
 #[allow(dead_code)]
 #[cfg(not(any(feature = "docs", feature = "pkg-config")))]
-/// The version of the TDLib library.
+// The version of the TDLib library.
 const TDLIB_VERSION: &str = "1.8.29";
 #[cfg(feature = "download-tdlib")]
 const TDLIB_CARGO_PKG_VERSION: &str = "1.0.4";
@@ -178,6 +178,38 @@ fn generic_build(lib_path: Option<String>) {
         panic!("tdjson shared library not found at {}", mut_lib_path);
     }
 
+    // This should be not necessary, but it is a workaround because windows does not find the
+    // tdjson.dll using the commands below.
+    // TODO: investigate and if it is a bug in `cargo` or `rustc`, open an issue to `cargo` to fix
+    // this.
+    #[cfg(all(target_os = "windows", target_arch = "x86_64"))]
+    {
+        let bin_dir = format!(r"{}\bin", prefix);
+        let cargo_bin = format!("{}/.cargo/bin", dirs::home_dir().unwrap().to_str().unwrap());
+
+        let libcrypto3x64 = format!(r"{}\libcrypto-3-x64.dll", bin_dir);
+        let libssl3x64 = format!(r"{}\libssl-3-x64.dll", bin_dir);
+        let tdjson = format!(r"{}\tdjson.dll", bin_dir);
+        let zlib1 = format!(r"{}\zlib1.dll", bin_dir);
+
+        let cargo_libcrypto3x64 = format!(r"{}\libcrypto-3-x64.dll", cargo_bin);
+        let cargo_libssl3x64 = format!(r"{}\libssl-3-x64.dll", cargo_bin);
+        let cargo_tdjson = format!(r"{}\tdjson.dll", cargo_bin);
+        let cargo_zlib1 = format!(r"{}\zlib1.dll", cargo_bin);
+
+        // Delete the files if they exist
+        let _ = std::fs::remove_file(&cargo_libcrypto3x64);
+        let _ = std::fs::remove_file(&cargo_libssl3x64);
+        let _ = std::fs::remove_file(&cargo_tdjson);
+        let _ = std::fs::remove_file(&cargo_zlib1);
+
+        // Move all files to cargo_bin
+        let _ = std::fs::copy(libcrypto3x64.clone(), cargo_libcrypto3x64.clone());
+        let _ = std::fs::copy(libssl3x64.clone(), cargo_libssl3x64.clone());
+        let _ = std::fs::copy(tdjson.clone(), cargo_tdjson.clone());
+        let _ = std::fs::copy(zlib1.clone(), cargo_zlib1.clone());
+    }
+
     #[cfg(all(target_os = "windows", target_arch = "x86_64"))]
     {
         let bin_dir = format!(r"{}\bin", prefix);
@@ -204,6 +236,7 @@ fn generic_build(lib_path: Option<String>) {
 /// - `pkg-config` and `local-tdlib`
 /// - `pkg-config` and `download-tdlib`
 /// - `local-tdlib` and `download-tdlib`
+///
 /// If the features are not correctly set, the function will generate a compile error
 pub fn check_features() {
     // #[cfg(not(any(feature = "docs", feature = "local-tdlib", feature = "pkg-config", feature = "download-tdlib")))]
@@ -395,8 +428,8 @@ pub fn build_local_tdlib() {
 ///
 /// # Arguments
 /// - `dest_path`: The destination path where the tdlib library will be copied. If `None`, the path
-/// will be the `OUT_DIR` environment variable. This argument is used only when the
-/// `download-tdlib` feature is enabled.
+///   will be the `OUT_DIR` environment variable. This argument is used only when the
+///   `download-tdlib` feature is enabled.
 ///
 /// The function will check if the features are correctly set.
 /// The function will set the `rerun-if-changed` and `rerun-if-env-changed` flags for the build
@@ -409,6 +442,7 @@ pub fn build_local_tdlib() {
 /// [dependencies]
 /// tdlib = { version = "...", features = ["download-tdlib"] }
 ///
+
 /// [build-dependencies]
 /// tdlib = { version = "...", features = [ "download-tdlib" ] }
 /// ```
@@ -424,6 +458,7 @@ pub fn build_local_tdlib() {
 pub fn build(_dest_path: Option<String>) {
     check_features();
     set_rerun_if();
+
     #[cfg(feature = "pkg-config")]
     build_pkg_config();
     #[cfg(feature = "download-tdlib")]

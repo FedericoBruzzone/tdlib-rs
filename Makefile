@@ -19,10 +19,11 @@ export RUST_BACKTRACE := 1
 # Available bin_name:
 #   get_me
 
+# ARGS="--features download-tdlib"
 all:
 	$(MAKE) fmt
-	$(MAKE) clippy # ARGS="--features download-tdlib"
-	$(MAKE) test # ARGS="--features download-tdlib"
+	$(MAKE) clippy
+	$(MAKE) test
 
 build_local:
 	cargo build --no-default-features --features local-tdlib
