@@ -6,7 +6,6 @@
 
 #[allow(dead_code)]
 #[cfg(not(any(feature = "docs", feature = "pkg-config")))]
-// The version of the TDLib library.
 const TDLIB_VERSION: &str = "1.8.29";
 #[cfg(feature = "download-tdlib")]
 const TDLIB_CARGO_PKG_VERSION: &str = "1.0.5";
@@ -57,6 +56,7 @@ fn copy_dir_all(
 /// - Windows x86_64
 /// - MacOS x86_64
 /// - MacOS aarch64
+///
 /// If the OS or architecture is not supported, the function will panic.
 fn download_tdlib() {
     let base_url = "https://github.com/FedericoBruzzone/tdlib-rs/releases/download";
@@ -136,8 +136,11 @@ fn download_tdlib() {
 /// - `cargo:rustc-link-lib=dylib=tdjson`
 /// - `cargo:rustc-link-arg=-Wl,-rpath,.../tdlib/lib`
 /// - `cargo:rustc-link-search=native=.../tdlib/bin` (only for Windows x86_64)
+///
 /// The `...` represents the `dest_path` or the `OUT_DIR` environment variable.
+///
 /// If the tdlib library is not found at the specified path, the function will panic.
+///
 /// The function will panic if the tdlib library is not found at the specified path.
 fn generic_build(lib_path: Option<String>) {
     let correct_lib_path: String;
@@ -288,6 +291,7 @@ pub fn set_rerun_if() {
 /// It requires the following variables to be set:
 /// - `PKG_CONFIG_PATH=$HOME/lib/tdlib/lib/pkgconfig/:$PKG_CONFIG_PATH`
 /// - `LD_LIBRARY_PATH=$HOME/lib/tdlib/lib/:$LD_LIBRARY_PATH`
+///
 /// If the variables are not set, the function will panic.
 ///
 /// # Example
@@ -328,6 +332,7 @@ pub fn build_pkg_config() {
 /// - `cargo:rustc-link-lib=dylib=tdjson`
 /// - `cargo:rustc-link-arg=-Wl,-rpath,.../tdlib/lib`
 /// - `cargo:rustc-link-search=native=.../tdlib/bin` (only for Windows x86_64)
+///
 /// The `...` represents the `dest_path` or the `OUT_DIR` environment variable.
 ///
 /// The function will download the tdlib library from the GitHub release page.
@@ -337,6 +342,7 @@ pub fn build_pkg_config() {
 /// - Windows x86_64
 /// - MacOS x86_64
 /// - MacOS aarch64
+///
 /// If the OS or architecture is not supported, the function will panic.
 ///
 /// # Example
@@ -385,13 +391,16 @@ pub fn build_download_tdlib(dest_path: Option<String>) {
 /// You can directly download the tdlib library from the [TDLib Release GitHub page](https://github.com/FedericoBruzzone/tdlib-rs/releases).
 ///
 /// The `LOCAL_TDLIB_PATH` environment variable must be set to the path of the tdlib folder.
+///
 /// The function will pass to the `rustc` the following flags:
 /// - `cargo:rustc-link-search=native=.../tdlib/lib`
 /// - `cargo:include=.../tdlib/include`
 /// - `cargo:rustc-link-lib=dylib=tdjson`
 /// - `cargo:rustc-link-arg=-Wl,-rpath,.../tdlib/lib`
 /// - `cargo:rustc-link-search=native=.../tdlib/bin` (only for Windows x86_64)
+///
 /// The `...` represents the `LOCAL_TDLIB_PATH` environment variable.
+///
 /// If the `LOCAL_TDLIB_PATH` environment variable is not set, the function will panic.
 ///
 /// # Example
