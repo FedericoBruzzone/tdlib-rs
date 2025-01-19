@@ -1,8 +1,8 @@
-/// The build module is used to build the project using the enabled features.
-/// The features are correctly set when exactly one of the following features is enabled:
-/// - `local-tdlib`
-/// - `pkg-config`
-/// - `download-tdlib`
+//! The build module is used to build the project using the enabled features.
+//! The features are correctly set when exactly one of the following features is enabled:
+//! - `local-tdlib`
+//! - `pkg-config`
+//! - `download-tdlib`
 
 #[allow(dead_code)]
 #[cfg(not(any(feature = "docs", feature = "pkg-config")))]
@@ -451,7 +451,6 @@ pub fn build_local_tdlib() {
 /// [dependencies]
 /// tdlib = { version = "...", features = ["download-tdlib"] }
 ///
-
 /// [build-dependencies]
 /// tdlib = { version = "...", features = [ "download-tdlib" ] }
 /// ```
