@@ -30,6 +30,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Install needed packages
+        run: | 
+          sudo apt update
+          sudo apt install libc++-dev libc++abi-dev
       - name: Download TDLib
         if:  matrix.feature == 'local-tdlib' || matrix.feature == 'pkg-config'
         run: |
