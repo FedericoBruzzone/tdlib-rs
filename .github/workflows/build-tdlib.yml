@@ -3,6 +3,8 @@ name: Build TDLib
 on:
   workflow_dispatch:
   workflow_call:
+  pull_request:
+    branches: [ main ]
 
 env:
     TDLIB_VERSION: "1.8.29"
