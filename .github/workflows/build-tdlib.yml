@@ -32,14 +32,14 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get -y upgrade
-          sudo apt-get -y install make git zlib1g-dev libssl-dev gperf php-cli cmake clang-14 libc++-dev libc++abi-dev libatomic1
+          sudo apt-get install make git zlib1g-dev libssl-dev gperf php-cli cmake clang-18 libc++-18-dev libc++abi-18-dev libatomic1
           git clone https://github.com/tdlib/td.git
           cd td
           git checkout $TDLIB_COMMIT
           rm -rf build
           mkdir build
           cd build
-          CXXFLAGS="-stdlib=libc++" CC=/usr/bin/clang-14 CXX=/usr/bin/clang++-14 cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX:PATH=../tdlib ..
+          CXXFLAGS="-stdlib=libc++" CC=/usr/bin/clang-18 CXX=/usr/bin/clang++-18 cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX:PATH=../tdlib -DTD_ENABLE_LTO=ON -DCMAKE_AR=/usr/bin/llvm-ar-18 -DCMAKE_NM=/usr/bin/llvm-nm-18 -DCMAKE_OBJDUMP=/usr/bin/llvm-objdump-18 -DCMAKE_RANLIB=/usr/bin/llvm-ranlib-18 ..
           cmake --build . --target install
       - name: Save cache TDLib
         uses: actions/cache/save@v4
