@@ -73,14 +73,14 @@ jobs:
         if: steps.cache-tdlib-restore.outputs.cache-hit != 'true'
         run: |
           /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-          brew install gperf cmake openssl
+          brew install gperf openssl
           git clone https://github.com/tdlib/td.git
           cd td
           git checkout $TDLIB_COMMIT
           rm -rf build
           mkdir build
           cd build
-          cmake -DCMAKE_BUILD_TYPE=Release -DOPENSSL_ROOT_DIR=${{ runner.arch == 'ARM64' && '/opt/homebrew/opt/openssl/' || '/usr/local/opt/openssl/' }} -DCMAKE_INSTALL_PREFIX:PATH=../tdlib ..
+          cmake -DCMAKE_BUILD_TYPE=Release -DOPENSSL_ROOT_DIR=${{ runner.arch == 'ARM64' && '/opt/homebrew/opt/openssl/' || '/usr/local/opt/openssl/' }} -DCMAKE_INSTALL_PREFIX:PATH=../tdlib -DTD_ENABLE_LTO=ON ..
           cmake --build . --target install
       - name: Save cache TDLib
         uses: actions/cache/save@v4
