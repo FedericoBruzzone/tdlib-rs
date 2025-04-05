@@ -32,7 +32,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get -y upgrade
-          sudo apt-get -y install make git zlib1g-dev libssl-dev gperf php-cli cmake clang-14 libc++-dev libc++abi-dev
+          sudo apt-get -y install make git zlib1g-dev libssl-dev gperf php-cli cmake clang-14 libc++-dev libc++abi-dev libatomic1
           git clone https://github.com/tdlib/td.git
           cd td
           git checkout $TDLIB_COMMIT
