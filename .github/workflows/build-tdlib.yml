@@ -10,14 +10,21 @@ env:
 
 jobs:
   build-linux:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest # arm64 (M1)
+          - os: ubuntu-24.04-arm # Intel
+
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Restore cache TDLib
         id: cache-tdlib-restore
         uses: actions/cache/restore@v4
         with:
           path: td/
-          key: tdlib-${{ env.TDLIB_VERSION }}-linux-x86_64
+          key: tdlib-${{ env.TDLIB_VERSION }}-linux-${{ runner.arch == 'ARM64' && 'aarch64' || 'x86_64' }}
       - name: Build TDLib
         if: steps.cache-tdlib-restore.outputs.cache-hit != 'true'
         run: |
