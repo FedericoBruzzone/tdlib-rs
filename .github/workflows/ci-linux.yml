@@ -38,11 +38,7 @@ jobs:
       - name: Download TDLib
         if:  matrix.feature == 'local-tdlib' || matrix.feature == 'pkg-config'
         run: |
-          if [[ "${{ matrix.os }}" == *"-arm" ]]; then
-            gh release download --pattern 'tdlib-*-linux-aarch64.zip'
-          else
-            gh release download --pattern 'tdlib-*-linux-x86_64.zip'
-          fi
+          gh release download --pattern ${{ runner.arch == 'ARM64' && 'tdlib-*-linux-aarch64.zip' || 'tdlib-*-linux-x86_64.zip' }}
           unzip -q *.zip -d .
       - name: Set pkg-config environment variables
         if: matrix.feature == 'pkg-config'
