@@ -63,11 +63,13 @@ fn download_tdlib() {
     let url = format!(
         "{}/v{}/tdlib-{}-{}-{}.zip",
         base_url,
-        TDLIB_CARGO_PKG_VERSION,
+        env!("CARGO_PKG_VERSION"),
         TDLIB_VERSION,
         std::env::var("CARGO_CFG_TARGET_OS").unwrap(),
         std::env::var("CARGO_CFG_TARGET_ARCH").unwrap(),
     );
+
+    println!("[tdlib-rs/src/build.rs] Attempting download from: {}", url);
 
     let out_dir = std::env::var("OUT_DIR").unwrap();
     let tdlib_dir = format!("{}/tdlib", &out_dir);
