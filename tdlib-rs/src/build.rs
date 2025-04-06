@@ -180,6 +180,17 @@ fn generic_build(lib_path: Option<String>) {
         {
             format!(r"{}\tdjson.lib", lib_dir)
         }
+        // Add fallback using compile_error! for clarity during build
+        #[cfg(not(any(
+            all(target_os = "linux", target_arch = "x86_64"),
+            all(target_os = "linux", target_arch = "aarch64"),
+            all(target_os = "macos", target_arch = "x86_64"),
+            all(target_os = "macos", target_arch = "aarch64"),
+            all(target_os = "windows", target_arch = "x86_64")
+        )))]
+        {
+            compile_error!("Unsupported target platform for tdlib-rs prebuilt binaries. Use `pkg-config` feature or build TDLib manually.");
+        }
     };
 
     if !std::path::PathBuf::from(mut_lib_path.clone()).exists() {
