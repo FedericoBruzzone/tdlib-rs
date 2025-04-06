@@ -1,9 +1,9 @@
 [package]
 name = "tdlib-rs"
-version = "1.0.5"
+version = "1.0.6"
 authors = [
-    "Federico Bruzzone <federico.bruzzone.i@gmail.com>",
-    "Andrea Longoni",
+	"Federico Bruzzone <federico.bruzzone.i@gmail.com>",
+	"Andrea Longoni",
 ]
 edition = "2021"
 license = "MIT OR Apache-2.0"

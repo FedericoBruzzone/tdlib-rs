@@ -73,6 +73,7 @@ fn copy_local_tdlib() {
 /// Build the project using the generic build configuration.
 /// The current supported platforms are:
 /// - Linux x86_64
+/// - Linux aarch64
 /// - Windows x86_64
 /// - MacOS x86_64
 /// - MacOS aarch64
@@ -82,7 +83,10 @@ fn generic_build() {
     let include_dir = format!("{}/include", prefix);
     let lib_dir = format!("{}/lib", prefix);
     let lib_path = {
-        #[cfg(all(target_os = "linux", target_arch = "x86_64"))]
+        #[cfg(any(
+            all(target_os = "linux", target_arch = "x86_64"),
+            all(target_os = "linux", target_arch = "aarch64")
+        ))]
         {
             format!("{}/libtdjson.so.{}", lib_dir, TDLIB_VERSION)
         }
@@ -117,7 +121,7 @@ fn generic_build() {
 
 #[cfg(feature = "download-tdlib")]
 fn download_tdlib() {
-    let base_url = "https://github.com/FedericoBruzzone/tdlib-rs/releases/download";
+    let base_url = "https://github.com/edisontim/tdlib-rs/releases/download";
     let url = format!(
         "{}/v{}/tdlib-{}-{}-{}.zip",
         base_url,
