@@ -157,8 +157,14 @@ fn download_tdlib() {
 
     println!("Attempting to download from URL: {}", url);
 
-    // Create the request
-    let response = reqwest::blocking::get(&url).unwrap();
+    // Create the request and handle potential errors
+    let response = match reqwest::blocking::get(&url) {
+        Ok(resp) => resp,
+        Err(e) => {
+            panic!("Failed to initiate download request to {}: {}\nCheck network connectivity and certificate configuration.", url, e);
+        }
+    };
+
     println!("Download response status: {}", response.status());
 
     // Check if the response status is successful
@@ -240,6 +246,8 @@ fn download_tdlib() {
 }
 
 fn main() -> std::io::Result<()> {
+    println!("Build script: Starting main...");
+
     #[cfg(all(feature = "docs", feature = "pkg-config"))]
     compile_error!(
         "feature \"docs\" and feature \"pkg-config\" cannot be enabled at the same time"
@@ -267,6 +275,8 @@ fn main() -> std::io::Result<()> {
         #[cfg(feature = "pkg-config")]
         system_deps::Config::new().probe().unwrap();
 
+        #[cfg(feature = "download-tdlib")]
+        println!("Build script: Calling download_tdlib...");
         #[cfg(feature = "download-tdlib")]
         download_tdlib();
 
