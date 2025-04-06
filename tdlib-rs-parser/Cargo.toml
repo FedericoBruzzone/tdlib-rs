@@ -1,20 +1,14 @@
 [package]
 name = "tdlib-rs-parser"
-version = "1.0.5"
+version = "1.0.6"
 authors = [
-    "Federico Bruzzone <federico.bruzzone.i@gmail.com>",
-    "Andrea Longoni",
+	"Federico Bruzzone <federico.bruzzone.i@gmail.com>",
+	"Andrea Longoni",
 ]
 edition = "2021"
 license = "MIT OR Apache-2.0"
 homepage = "https://github.com/FedericoBruzzone/tdlib-rs"
 repository = "https://github.com/FedericoBruzzone/tdlib-rs"
 documentation = "https://docs.rs/tdlib-rs-parser"
-keywords = [
-    "tdlib",
-    "telegram",
-    "parser",
-    "api",
-    "tdlib-rs",
-]
+keywords = ["tdlib", "telegram", "parser", "api", "tdlib-rs"]
 description = "A parser for TDLib's Type Language definitions."
