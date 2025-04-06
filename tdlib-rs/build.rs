@@ -155,8 +155,11 @@ fn download_tdlib() {
     let tdlib_dir = format!("{}/tdlib", &out_dir);
     let zip_path = format!("{}.zip", &tdlib_dir);
 
+    println!("Attempting to download from URL: {}", url);
+
     // Create the request
     let response = reqwest::blocking::get(&url).unwrap();
+    println!("Download response status: {}", response.status());
 
     // Check if the response status is successful
     if response.status().is_success() {
@@ -208,6 +211,32 @@ fn download_tdlib() {
     }
 
     let _ = std::fs::remove_file(&zip_path);
+
+    // --- Add directory listing for debugging ---
+    println!("Listing contents of {}", tdlib_prefix.display());
+    match std::fs::read_dir(&tdlib_prefix) {
+        Ok(entries) => {
+            for entry in entries {
+                if let Ok(entry) = entry {
+                    println!("  - {:?}", entry.path());
+                }
+            }
+        }
+        Err(e) => println!("  Error reading directory: {}", e),
+    }
+    let lib_dir_path = tdlib_prefix.join("lib");
+    println!("Listing contents of {}", lib_dir_path.display());
+    match std::fs::read_dir(&lib_dir_path) {
+        Ok(entries) => {
+            for entry in entries {
+                if let Ok(entry) = entry {
+                    println!("  - {:?}", entry.path());
+                }
+            }
+        }
+        Err(e) => println!("  Error reading directory: {}", e),
+    }
+    // --- End of debugging ---
 }
 
 fn main() -> std::io::Result<()> {
