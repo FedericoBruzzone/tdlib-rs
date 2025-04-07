@@ -187,7 +187,7 @@ fn download_tdlib() {
 
     let mut archive = zip::ZipArchive::new(File::open(&zip_path).unwrap()).unwrap();
 
-    let tdlib_prefix = Path::new(&out_dir).join("tdlib");
+    let tdlib_prefix = Path::new(&tdlib_dir);
     std::fs::create_dir_all(&tdlib_prefix).unwrap();
 
     for i in 0..archive.len() {

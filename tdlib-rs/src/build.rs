@@ -149,7 +149,7 @@ fn download_tdlib() {
 /// The function will panic if the tdlib library is not found at the specified path.
 fn generic_build() {
     let out_dir = std::env::var("OUT_DIR").unwrap();
-    let prefix = out_dir;
+    let prefix = format!("{}/tdlib", out_dir);
     let include_dir = format!("{}/include", prefix);
     let lib_dir = format!("{}/lib", prefix);
     let lib_path = {
