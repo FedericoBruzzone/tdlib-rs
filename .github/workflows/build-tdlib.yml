@@ -39,7 +39,7 @@ jobs:
           rm -rf build
           mkdir build
           cd build
-          CXXFLAGS="-stdlib=libc++" CC=/usr/bin/clang-18 CXX=/usr/bin/clang++-18 cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX:PATH=../tdlib -DTD_ENABLE_LTO=ON -DCMAKE_AR=/usr/bin/llvm-ar-18 -DCMAKE_NM=/usr/bin/llvm-nm-18 -DCMAKE_OBJDUMP=/usr/bin/llvm-objdump-18 -DCMAKE_RANLIB=/usr/bin/llvm-ranlib-18 ..
+          CXXFLAGS="-stdlib=libc++" CC=/usr/bin/clang-18 CXX=/usr/bin/clang++-18 cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX:PATH=../tdlib ..
           cmake --build . --target install
       - name: Save cache TDLib
         uses: actions/cache/save@v4
@@ -80,7 +80,7 @@ jobs:
           rm -rf build
           mkdir build
           cd build
-          cmake -DCMAKE_BUILD_TYPE=Release -DOPENSSL_ROOT_DIR=${{ runner.arch == 'ARM64' && '/opt/homebrew/opt/openssl/' || '/usr/local/opt/openssl/' }} -DCMAKE_INSTALL_PREFIX:PATH=../tdlib -DTD_ENABLE_LTO=ON ..
+          cmake -DCMAKE_BUILD_TYPE=Release -DOPENSSL_ROOT_DIR=/opt/homebrew/opt/openssl/ -DCMAKE_INSTALL_PREFIX:PATH=../tdlib ..
           cmake --build . --target install
       - name: Save cache TDLib
         uses: actions/cache/save@v4
