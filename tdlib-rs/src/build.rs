@@ -98,9 +98,12 @@ fn download_tdlib() {
 
     let mut archive = zip::ZipArchive::new(std::fs::File::open(&zip_path).unwrap()).unwrap();
 
+    let tdlib_prefix = std::path::Path::new(&out_dir).join("tdlib");
+    std::fs::create_dir_all(&tdlib_prefix).unwrap();
+
     for i in 0..archive.len() {
         let mut file = archive.by_index(i).unwrap();
-        let outpath = std::path::Path::new(&out_dir).join(file.name());
+        let outpath = tdlib_prefix.join(file.name());
 
         if (*file.name()).ends_with('/') {
             std::fs::create_dir_all(&outpath).unwrap();
@@ -180,7 +183,6 @@ fn generic_build(lib_path: Option<String>) {
         {
             format!(r"{}\tdjson.lib", lib_dir)
         }
-        // Add fallback using compile_error! for clarity during build
         #[cfg(not(any(
             all(target_os = "linux", target_arch = "x86_64"),
             all(target_os = "linux", target_arch = "aarch64"),
