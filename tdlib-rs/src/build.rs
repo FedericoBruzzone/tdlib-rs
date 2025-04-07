@@ -147,24 +147,12 @@ fn download_tdlib() {
 /// If the tdlib library is not found at the specified path, the function will panic.
 ///
 /// The function will panic if the tdlib library is not found at the specified path.
-fn generic_build(lib_path: Option<String>) {
-    let correct_lib_path: String;
-    match lib_path {
-        Some(lib_path) => {
-            if lib_path.ends_with('/') || lib_path.ends_with('\\') {
-                correct_lib_path = lib_path[..lib_path.len() - 1].to_string();
-            } else {
-                correct_lib_path = lib_path.to_string();
-            }
-        }
-        None => {
-            correct_lib_path = format!("{}/tdlib", std::env::var("OUT_DIR").unwrap());
-        }
-    }
-    let prefix = correct_lib_path.to_string();
+fn generic_build() {
+    let out_dir = std::env::var("OUT_DIR").unwrap();
+    let prefix = out_dir;
     let include_dir = format!("{}/include", prefix);
     let lib_dir = format!("{}/lib", prefix);
-    let mut_lib_path = {
+    let lib_path = {
         #[cfg(any(
             all(target_os = "linux", target_arch = "x86_64"),
             all(target_os = "linux", target_arch = "aarch64")
@@ -195,8 +183,8 @@ fn generic_build(lib_path: Option<String>) {
         }
     };
 
-    if !std::path::PathBuf::from(mut_lib_path.clone()).exists() {
-        panic!("tdjson shared library not found at {}", mut_lib_path);
+    if !std::path::PathBuf::from(lib_path.clone()).exists() {
+        panic!("tdjson shared library not found at {}", lib_path);
     }
 
     // This should be not necessary, but it is a workaround because windows does not find the
@@ -397,7 +385,7 @@ pub fn build_download_tdlib(dest_path: Option<String>) {
             )
             .unwrap();
         }
-        generic_build(dest_path);
+        generic_build();
     }
 }
 #[cfg(any(feature = "local-tdlib", feature = "docs"))]
@@ -446,7 +434,7 @@ pub fn build_local_tdlib() {
     {
         // copy_local_tdlib();
         let path = std::env::var("LOCAL_TDLIB_PATH").unwrap();
-        generic_build(Some(path));
+        generic_build();
     }
 }
 
