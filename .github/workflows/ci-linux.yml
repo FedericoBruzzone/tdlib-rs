@@ -2,9 +2,9 @@ name: CI Linux
 
 on:
   push:
-    branches: [ main ]
+    # branches: [ main ]
   pull_request:
-    branches: [ main ]
+    # branches: [ main ]
   workflow_run:
     workflows: [ CD ]
     types: [ completed ]
