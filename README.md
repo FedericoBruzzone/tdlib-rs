@@ -1,3 +1,6 @@
+[github-license-mit]: https://github.com/FedericoBruzzone/tdlib-rs/blob/main/LICENSE-MIT
+[github-license-apache]: https://github.com/FedericoBruzzone/tdlib-rs/blob/main/LICENSE-APACHE
+
 # tdlib-rs
 
 [![Latest version](https://img.shields.io/crates/v/tdlib_rs.svg)](https://crates.io/crates/tdlib_rs)
