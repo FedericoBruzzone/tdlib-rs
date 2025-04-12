@@ -45,6 +45,8 @@ fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> std::io::Result
     for entry in std::fs::read_dir(src)? {
         let entry = entry?;
         let ty = entry.file_type()?;
+        println!("entry: {:?}", entry.file_name());
+        println!("dst: {:?}", dst.as_ref().join(entry.file_name()));
         if ty.is_dir() {
             copy_dir_all(entry.path(), dst.as_ref().join(entry.file_name()))?;
         } else {
@@ -61,6 +63,8 @@ fn copy_local_tdlib() {
         Ok(tdlib_path) => {
             let out_dir = env::var("OUT_DIR").unwrap();
             let prefix = format!("{}/tdlib", out_dir);
+            println!("tdlib_path: {:?}", tdlib_path);
+            println!("prefix: {:?}", prefix);
             copy_dir_all(Path::new(&tdlib_path), Path::new(&prefix)).unwrap();
         }
         Err(_) => {
@@ -188,7 +192,7 @@ fn download_tdlib() {
     let mut archive = zip::ZipArchive::new(File::open(&zip_path).unwrap()).unwrap();
 
     let tdlib_prefix = Path::new(&tdlib_dir);
-    std::fs::create_dir_all(&tdlib_prefix).unwrap();
+    std::fs::create_dir_all(tdlib_prefix).unwrap();
 
     for i in 0..archive.len() {
         let mut file = archive.by_index(i).unwrap();
@@ -217,32 +221,6 @@ fn download_tdlib() {
     }
 
     let _ = std::fs::remove_file(&zip_path);
-
-    // --- Add directory listing for debugging ---
-    println!("Listing contents of {}", tdlib_prefix.display());
-    match std::fs::read_dir(&tdlib_prefix) {
-        Ok(entries) => {
-            for entry in entries {
-                if let Ok(entry) = entry {
-                    println!("  - {:?}", entry.path());
-                }
-            }
-        }
-        Err(e) => println!("  Error reading directory: {}", e),
-    }
-    let lib_dir_path = tdlib_prefix.join("lib");
-    println!("Listing contents of {}", lib_dir_path.display());
-    match std::fs::read_dir(&lib_dir_path) {
-        Ok(entries) => {
-            for entry in entries {
-                if let Ok(entry) = entry {
-                    println!("  - {:?}", entry.path());
-                }
-            }
-        }
-        Err(e) => println!("  Error reading directory: {}", e),
-    }
-    // --- End of debugging ---
 }
 
 fn main() -> std::io::Result<()> {
