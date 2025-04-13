@@ -10,27 +10,33 @@ env:
 
 jobs:
   build-linux:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+          - os: ubuntu-24.04-arm
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Restore cache TDLib
         id: cache-tdlib-restore
         uses: actions/cache/restore@v4
         with:
           path: td/
-          key: tdlib-${{ env.TDLIB_VERSION }}-linux-x86_64
+          key:key: tdlib-${{ env.TDLIB_VERSION }}-linux-${{ runner.arch == 'ARM64' && 'aarch64' || 'x86_64' }}
       - name: Build TDLib
         if: steps.cache-tdlib-restore.outputs.cache-hit != 'true'
         run: |
           sudo apt-get update
           sudo apt-get -y upgrade
-          sudo apt-get -y install make git zlib1g-dev libssl-dev gperf php-cli cmake clang-14 libc++-dev libc++abi-dev
+          sudo apt-get install make git zlib1g-dev libssl-dev gperf php-cli cmake clang-18 libc++-18-dev libc++abi-18-dev
           git clone https://github.com/tdlib/td.git
           cd td
           git checkout $TDLIB_COMMIT
           rm -rf build
           mkdir build
           cd build
-          CXXFLAGS="-stdlib=libc++" CC=/usr/bin/clang-14 CXX=/usr/bin/clang++-14 cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX:PATH=../tdlib ..
+          CXXFLAGS="-stdlib=libc++" CC=/usr/bin/clang-18 CXX=/usr/bin/clang++-18 cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX:PATH=../tdlib ..
           cmake --build . --target install
       - name: Save cache TDLib
         uses: actions/cache/save@v4
@@ -64,7 +70,7 @@ jobs:
         if: steps.cache-tdlib-restore.outputs.cache-hit != 'true'
         run: |
           /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-          brew install gperf cmake openssl
+          brew install gperf openssl
           git clone https://github.com/tdlib/td.git
           cd td
           git checkout $TDLIB_COMMIT
@@ -103,7 +109,7 @@ jobs:
           git checkout $TDLIB_COMMIT
           git clone https://github.com/Microsoft/vcpkg.git
           cd vcpkg
-          git checkout cd5e746ec203c8c3c61647e0886a8df8c1e78e41
+          git checkout 07b30b49e5136a36100a2ce644476e60d7f3ddc1
           ./bootstrap-vcpkg.bat
           ./vcpkg.exe install gperf:x64-windows openssl:x64-windows zlib:x64-windows
           cd ..
