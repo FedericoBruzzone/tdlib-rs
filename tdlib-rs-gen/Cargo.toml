@@ -1,6 +1,6 @@
 [package]
 name = "tdlib-rs-gen"
-version = "1.0.5"
+version = "1.1.0"
 authors = [
     "Federico Bruzzone <federico.bruzzone.i@gmail.com>",
     "Andrea Longoni",
@@ -20,4 +20,4 @@ keywords = [
 description = "Rust code generator from TDLib's API definitions."
 
 [dependencies]
-tdlib-rs-parser = { path = "../tdlib-rs-parser", version = "1.0.5" }
+tdlib-rs-parser = { path = "../tdlib-rs-parser", version = "1.1.0" }

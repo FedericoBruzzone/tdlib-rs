@@ -9,6 +9,14 @@ Here we write upgrading notes for brands. It's a team effort to make them as str
 ### Changed
 ### Fixed
 
+## [1.1.0] - 2025-04-17
+
+### Added
+- Added support for Linux ARM architecture.
+
+### Fixed
+- Fixed some small issues in the continuous integration pipeline.
+
 ## [1.0.5] - 2024-08-08
 
 ### Added
