@@ -28,6 +28,10 @@ pub fn create_client() -> i32 {
     tdjson::create_client()
 }
 
+pub fn set_log_verbosity_level(level: i32) {
+    tdjson::set_log_verbosity_level(level);
+}
+
 /// Receive a single update or response from TdLib. If it's an update, it
 /// returns a tuple with the `Update` and the associated `client_id`.
 /// Note that to start receiving updates for a client you need to send
