@@ -75,6 +75,7 @@ fn copy_local_tdlib() {
 /// - Linux x86_64
 /// - Linux aarch64
 /// - Windows x86_64
+/// - Windows aarch64
 /// - MacOS x86_64
 /// - MacOS aarch64
 fn generic_build() {
@@ -97,7 +98,10 @@ fn generic_build() {
         {
             format!("{}/libtdjson.{}.dylib", lib_dir, TDLIB_VERSION)
         }
-        #[cfg(all(target_os = "windows", target_arch = "x86_64"))]
+        #[cfg(any(
+            all(target_os = "windows", target_arch = "x86_64"),
+            all(target_os = "windows", target_arch = "aarch64")
+        ))]
         {
             format!(r"{}\tdjson.lib", lib_dir)
         }
@@ -107,7 +111,10 @@ fn generic_build() {
         panic!("tdjson shared library not found at {}", lib_path);
     }
 
-    #[cfg(all(target_os = "windows", target_arch = "x86_64"))]
+    #[cfg(any(
+        all(target_os = "windows", target_arch = "x86_64"),
+        all(target_os = "windows", target_arch = "aarch64")
+    ))]
     {
         let bin_dir = format!(r"{}\bin", prefix);
         println!("cargo:rustc-link-search=native={}", bin_dir);

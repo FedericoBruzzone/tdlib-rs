@@ -53,7 +53,9 @@ fn copy_dir_all(
 /// The OUT_DIR environment variable is set by Cargo and points to the target directory.
 /// The OS and architecture currently supported are:
 /// - Linux x86_64
+/// - Linux aarch64
 /// - Windows x86_64
+/// - Windows aarch64
 /// - MacOS x86_64
 /// - MacOS aarch64
 ///
@@ -135,7 +137,7 @@ fn download_tdlib() {
 /// - `cargo:include=.../tdlib/include`
 /// - `cargo:rustc-link-lib=dylib=tdjson`
 /// - `cargo:rustc-link-arg=-Wl,-rpath,.../tdlib/lib`
-/// - `cargo:rustc-link-search=native=.../tdlib/bin` (only for Windows x86_64)
+/// - `cargo:rustc-link-search=native=.../tdlib/bin` (only for Windows)
 ///
 /// The `...` represents the `dest_path` or the `OUT_DIR` environment variable.
 ///
@@ -174,7 +176,10 @@ fn generic_build(lib_path: Option<String>) {
         {
             format!("{}/libtdjson.{}.dylib", lib_dir, TDLIB_VERSION)
         }
-        #[cfg(all(target_os = "windows", target_arch = "x86_64"))]
+        #[cfg(any(
+            all(target_os = "windows", target_arch = "x86_64"),
+            all(target_os = "windows", target_arch = "aarch64")
+        ))]
         {
             format!(r"{}\tdjson.lib", lib_dir)
         }
@@ -188,7 +193,10 @@ fn generic_build(lib_path: Option<String>) {
     // tdjson.dll using the commands below.
     // TODO: investigate and if it is a bug in `cargo` or `rustc`, open an issue to `cargo` to fix
     // this.
-    #[cfg(all(target_os = "windows", target_arch = "x86_64"))]
+    #[cfg(any(
+        all(target_os = "windows", target_arch = "x86_64"),
+        all(target_os = "windows", target_arch = "aarch64")
+    ))]
     {
         let bin_dir = format!(r"{}\bin", prefix);
         let cargo_bin = format!("{}/.cargo/bin", dirs::home_dir().unwrap().to_str().unwrap());
@@ -216,7 +224,10 @@ fn generic_build(lib_path: Option<String>) {
         let _ = std::fs::copy(zlib1.clone(), cargo_zlib1.clone());
     }
 
-    #[cfg(all(target_os = "windows", target_arch = "x86_64"))]
+    #[cfg(any(
+        all(target_os = "windows", target_arch = "x86_64"),
+        all(target_os = "windows", target_arch = "aarch64")
+    ))]
     {
         let bin_dir = format!(r"{}\bin", prefix);
         println!("cargo:rustc-link-search=native={}", bin_dir);
@@ -334,7 +345,7 @@ pub fn build_pkg_config() {
 /// - `cargo:include=.../tdlib/include`
 /// - `cargo:rustc-link-lib=dylib=tdjson`
 /// - `cargo:rustc-link-arg=-Wl,-rpath,.../tdlib/lib`
-/// - `cargo:rustc-link-search=native=.../tdlib/bin` (only for Windows x86_64)
+/// - `cargo:rustc-link-search=native=.../tdlib/bin` (only for Windows)
 ///
 /// The `...` represents the `dest_path` or the `OUT_DIR` environment variable.
 ///
@@ -342,7 +353,9 @@ pub fn build_pkg_config() {
 /// Using the `download-tdlib` feature, no system dependencies are required.
 /// The OS and architecture currently supported are:
 /// - Linux x86_64
+/// - Linux aarch64
 /// - Windows x86_64
+/// - Windows aarch64
 /// - MacOS x86_64
 /// - MacOS aarch64
 ///
@@ -400,7 +413,7 @@ pub fn build_download_tdlib(dest_path: Option<String>) {
 /// - `cargo:include=.../tdlib/include`
 /// - `cargo:rustc-link-lib=dylib=tdjson`
 /// - `cargo:rustc-link-arg=-Wl,-rpath,.../tdlib/lib`
-/// - `cargo:rustc-link-search=native=.../tdlib/bin` (only for Windows x86_64)
+/// - `cargo:rustc-link-search=native=.../tdlib/bin` (only for Windows)
 ///
 /// The `...` represents the `LOCAL_TDLIB_PATH` environment variable.
 ///
