@@ -36,7 +36,7 @@ jobs:
         if: runner.arch == 'ARM64'
         uses: actions-rust-lang/setup-rust-toolchain@v1.9.0
         with:
-          target: x86_64-pc-windows-msvc
+          target: aarch64-pc-windows-msvc
           components: clippy, rustfmt
       - name: Download TDLib
         if:  matrix.feature == 'local-tdlib' || matrix.feature == 'pkg-config'
