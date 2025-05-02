@@ -61,7 +61,7 @@ fn copy_dir_all(
 ///
 /// If the OS or architecture is not supported, the function will panic.
 fn download_tdlib() {
-    let base_url = "https://github.com/Andreal2000/tdlib-rs/releases/download";
+    let base_url = "https://github.com/FedericoBruzzone/tdlib-rs/releases/download";
     let url = format!(
         "{}/v{}/tdlib-{}-{}-{}.zip",
         base_url,
