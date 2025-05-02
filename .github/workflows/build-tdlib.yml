@@ -93,14 +93,20 @@ jobs:
           overwrite: true
 
   build-windows:
-    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+          - os: windows-11-arm
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Restore cache TDLib
         id: cache-tdlib-restore
         uses: actions/cache/restore@v4
         with:
           path: td/
-          key: tdlib-${{ env.TDLIB_VERSION }}-windows-x86_64
+          key: tdlib-${{ env.TDLIB_VERSION }}-windows-${{ runner.arch == 'ARM64' && 'aarch64' || 'x86_64' }}
       - name: Build TDLib
         if: steps.cache-tdlib-restore.outputs.cache-hit != 'true'
         run: |
@@ -111,12 +117,21 @@ jobs:
           cd vcpkg
           git checkout 07b30b49e5136a36100a2ce644476e60d7f3ddc1
           ./bootstrap-vcpkg.bat
-          ./vcpkg.exe install gperf:x64-windows openssl:x64-windows zlib:x64-windows
+          if [[ "$RUNNER_ARCH" == "X64" ]]; then
+            ./vcpkg.exe install gperf:x64-windows openssl:x64-windows zlib:x64-windows
+            CMAKE_ARCH="x64"
+          elif [[ "$RUNNER_ARCH" == "ARM64" ]]; then
+            ./vcpkg.exe install gperf:arm64-windows openssl:arm64-windows zlib:arm64-windows
+            CMAKE_ARCH="ARM64"
+          else
+            echo "Unsupported architecture: $RUNNER_ARCH"
+            exit 1
+          fi
           cd ..
           rm -rf build
           mkdir build
           cd build
-          cmake -A x64 -DCMAKE_INSTALL_PREFIX:PATH=../tdlib -DCMAKE_TOOLCHAIN_FILE:FILEPATH=../vcpkg/scripts/buildsystems/vcpkg.cmake ..
+          cmake -A "$CMAKE_ARCH" -DCMAKE_INSTALL_PREFIX:PATH=../tdlib -DCMAKE_TOOLCHAIN_FILE:FILEPATH=../vcpkg/scripts/buildsystems/vcpkg.cmake ..
           cmake --build . --target install --config Release
         shell: bash
       - name: Save cache TDLib

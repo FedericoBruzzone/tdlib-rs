@@ -24,8 +24,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        feature: [local-tdlib, download-tdlib, pkg-config, docs]
         os: [ubuntu-latest, ubuntu-24.04-arm]
+        feature: [local-tdlib, download-tdlib, pkg-config, docs]
 
     runs-on: ${{ matrix.os }}
 

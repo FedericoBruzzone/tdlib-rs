@@ -24,17 +24,24 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        os: [windows-latest, windows-11-arm]
         feature: [local-tdlib, download-tdlib, pkg-config, docs]
 
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Install Rust
+        if: matrix.os == 'windows-11-arm'
+        uses: actions-rust-lang/setup-rust-toolchain@v1.12.0
+        with:
+          target: aarch64-pc-windows-msvc
+          components: clippy, rustfmt
       - name: Download TDLib
         if:  matrix.feature == 'local-tdlib' || matrix.feature == 'pkg-config'
         run: |
-          gh release download --pattern 'tdlib-*-windows-x86_64.zip'
+          gh release download --pattern ${{ runner.arch == 'ARM64' && 'tdlib-*-windows-aarch64.zip' || 'tdlib-*-windows-x86_64.zip' }}
           unzip -q *.zip -d .
         shell: bash
       - name: Install pkg-config
