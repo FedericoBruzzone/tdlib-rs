@@ -2,9 +2,10 @@ name: CI Linux
 
 on:
   push:
-    branches: [ main ]
+    branches-ignore: [ 'dependabot/**' ]
+    tags-ignore: [ '**' ]
   pull_request:
-    branches: [ main ]
+    branches: [ '**' ]
   workflow_run:
     workflows: [ CD ]
     types: [ completed ]
@@ -23,17 +24,22 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm]
         feature: [local-tdlib, download-tdlib, pkg-config, docs]
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Install needed packages
+        run: | 
+          sudo apt update
+          sudo apt install libc++-dev libc++abi-dev
       - name: Download TDLib
         if:  matrix.feature == 'local-tdlib' || matrix.feature == 'pkg-config'
         run: |
-          gh release download --pattern 'tdlib-*-linux-x86_64.zip'
+          gh release download --pattern ${{ runner.arch == 'ARM64' && 'tdlib-*-linux-aarch64.zip' || 'tdlib-*-linux-x86_64.zip' }}
           unzip -q *.zip -d .
       - name: Set pkg-config environment variables
         if: matrix.feature == 'pkg-config'

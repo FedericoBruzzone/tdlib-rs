@@ -1,3 +1,6 @@
+[github-license-mit]: https://github.com/FedericoBruzzone/tdlib-rs/blob/main/LICENSE-MIT
+[github-license-apache]: https://github.com/FedericoBruzzone/tdlib-rs/blob/main/LICENSE-APACHE
+
 # tdlib-rs
 
 [![Latest version](https://img.shields.io/crates/v/tdlib_rs.svg)](https://crates.io/crates/tdlib_rs)
@@ -140,11 +143,9 @@ Please review the license file provided in the repository for more information r
 
 ## Contact
 
-- Email:
-  - [federico.bruzzone.i@gmail.com]
-  - [federico.bruzzone@studenti.unimi.it]
-  - [andrea.longoni3@studenti.unimi.it]
-- GitHub:
+If you have any questions, suggestions, or feedback, do not hesitate to [contact me](https://federicobruzzone.github.io/).
+
+Mantainers:
   - [FedericoBruzzone](https://github.com/FedericoBruzzone)
   - [Andreal2000](https://github.com/Andreal2000)
 
@@ -153,3 +154,4 @@ Please review the license file provided in the repository for more information r
 - [grammers](https://github.com/Lonami/grammers): the `tdlib-tl-gen` and `tdlib-tl-parser` projects are forks of the `grammers-tl-gen` and `grammers-tl-parser` projects.
 - [rust-tdlib](https://github.com/aCLr/rust-tdlib): for inspiration about some client code.
 - [tdlib-rs](https://github.com/paper-plane-developers/tdlib-rs): for inspiration about the generator code.
+

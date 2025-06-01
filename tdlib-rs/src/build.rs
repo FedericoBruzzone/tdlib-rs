@@ -1,15 +1,15 @@
-/// The build module is used to build the project using the enabled features.
-/// The features are correctly set when exactly one of the following features is enabled:
-/// - `local-tdlib`
-/// - `pkg-config`
-/// - `download-tdlib`
+//! The build module is used to build the project using the enabled features.
+//! The features are correctly set when exactly one of the following features is enabled:
+//! - `local-tdlib`
+//! - `pkg-config`
+//! - `download-tdlib`
 
 #[allow(dead_code)]
 #[cfg(not(any(feature = "docs", feature = "pkg-config")))]
 /// The version of the TDLib library.
 const TDLIB_VERSION: &str = "1.8.31";
 #[cfg(feature = "download-tdlib")]
-const TDLIB_CARGO_PKG_VERSION: &str = "1.0.4";
+const TDLIB_CARGO_PKG_VERSION: &str = "1.1.0";
 
 // WARNING: This function is not used in the current version of the library.
 // #[cfg(not(any(feature = "docs", feature = "pkg-config", feature = "download-tdlib")))]
@@ -54,9 +54,12 @@ fn copy_dir_all(
 /// The OUT_DIR environment variable is set by Cargo and points to the target directory.
 /// The OS and architecture currently supported are:
 /// - Linux x86_64
+/// - Linux aarch64
 /// - Windows x86_64
+/// - Windows aarch64
 /// - MacOS x86_64
 /// - MacOS aarch64
+///
 /// If the OS or architecture is not supported, the function will panic.
 fn download_tdlib() {
     let base_url = "https://github.com/FedericoBruzzone/tdlib-rs/releases/download";
@@ -135,9 +138,12 @@ fn download_tdlib() {
 /// - `cargo:include=.../tdlib/include`
 /// - `cargo:rustc-link-lib=dylib=tdjson`
 /// - `cargo:rustc-link-arg=-Wl,-rpath,.../tdlib/lib`
-/// - `cargo:rustc-link-search=native=.../tdlib/bin` (only for Windows x86_64)
+/// - `cargo:rustc-link-search=native=.../tdlib/bin` (only for Windows)
+///
 /// The `...` represents the `dest_path` or the `OUT_DIR` environment variable.
+///
 /// If the tdlib library is not found at the specified path, the function will panic.
+///
 /// The function will panic if the tdlib library is not found at the specified path.
 fn generic_build(lib_path: Option<String>) {
     let correct_lib_path: String;
@@ -157,7 +163,10 @@ fn generic_build(lib_path: Option<String>) {
     let include_dir = format!("{}/include", prefix);
     let lib_dir = format!("{}/lib", prefix);
     let mut_lib_path = {
-        #[cfg(all(target_os = "linux", target_arch = "x86_64"))]
+        #[cfg(any(
+            all(target_os = "linux", target_arch = "x86_64"),
+            all(target_os = "linux", target_arch = "aarch64")
+        ))]
         {
             format!("{}/libtdjson.so.{}", lib_dir, TDLIB_VERSION)
         }
@@ -168,7 +177,10 @@ fn generic_build(lib_path: Option<String>) {
         {
             format!("{}/libtdjson.{}.dylib", lib_dir, TDLIB_VERSION)
         }
-        #[cfg(all(target_os = "windows", target_arch = "x86_64"))]
+        #[cfg(any(
+            all(target_os = "windows", target_arch = "x86_64"),
+            all(target_os = "windows", target_arch = "aarch64")
+        ))]
         {
             format!(r"{}\tdjson.lib", lib_dir)
         }
@@ -178,7 +190,45 @@ fn generic_build(lib_path: Option<String>) {
         panic!("tdjson shared library not found at {}", mut_lib_path);
     }
 
-    #[cfg(all(target_os = "windows", target_arch = "x86_64"))]
+    // This should be not necessary, but it is a workaround because windows does not find the
+    // tdjson.dll using the commands below.
+    // TODO: investigate and if it is a bug in `cargo` or `rustc`, open an issue to `cargo` to fix
+    // this.
+    #[cfg(any(
+        all(target_os = "windows", target_arch = "x86_64"),
+        all(target_os = "windows", target_arch = "aarch64")
+    ))]
+    {
+        let bin_dir = format!(r"{}\bin", prefix);
+        let cargo_bin = format!("{}/.cargo/bin", dirs::home_dir().unwrap().to_str().unwrap());
+
+        let libcrypto3x64 = format!(r"{}\libcrypto-3-x64.dll", bin_dir);
+        let libssl3x64 = format!(r"{}\libssl-3-x64.dll", bin_dir);
+        let tdjson = format!(r"{}\tdjson.dll", bin_dir);
+        let zlib1 = format!(r"{}\zlib1.dll", bin_dir);
+
+        let cargo_libcrypto3x64 = format!(r"{}\libcrypto-3-x64.dll", cargo_bin);
+        let cargo_libssl3x64 = format!(r"{}\libssl-3-x64.dll", cargo_bin);
+        let cargo_tdjson = format!(r"{}\tdjson.dll", cargo_bin);
+        let cargo_zlib1 = format!(r"{}\zlib1.dll", cargo_bin);
+
+        // Delete the files if they exist
+        let _ = std::fs::remove_file(&cargo_libcrypto3x64);
+        let _ = std::fs::remove_file(&cargo_libssl3x64);
+        let _ = std::fs::remove_file(&cargo_tdjson);
+        let _ = std::fs::remove_file(&cargo_zlib1);
+
+        // Move all files to cargo_bin
+        let _ = std::fs::copy(libcrypto3x64.clone(), cargo_libcrypto3x64.clone());
+        let _ = std::fs::copy(libssl3x64.clone(), cargo_libssl3x64.clone());
+        let _ = std::fs::copy(tdjson.clone(), cargo_tdjson.clone());
+        let _ = std::fs::copy(zlib1.clone(), cargo_zlib1.clone());
+    }
+
+    #[cfg(any(
+        all(target_os = "windows", target_arch = "x86_64"),
+        all(target_os = "windows", target_arch = "aarch64")
+    ))]
     {
         let bin_dir = format!(r"{}\bin", prefix);
         println!("cargo:rustc-link-search=native={}", bin_dir);
@@ -204,6 +254,7 @@ fn generic_build(lib_path: Option<String>) {
 /// - `pkg-config` and `local-tdlib`
 /// - `pkg-config` and `download-tdlib`
 /// - `local-tdlib` and `download-tdlib`
+///
 /// If the features are not correctly set, the function will generate a compile error
 pub fn check_features() {
     // #[cfg(not(any(feature = "docs", feature = "local-tdlib", feature = "pkg-config", feature = "download-tdlib")))]
@@ -255,6 +306,7 @@ pub fn set_rerun_if() {
 /// It requires the following variables to be set:
 /// - `PKG_CONFIG_PATH=$HOME/lib/tdlib/lib/pkgconfig/:$PKG_CONFIG_PATH`
 /// - `LD_LIBRARY_PATH=$HOME/lib/tdlib/lib/:$LD_LIBRARY_PATH`
+///
 /// If the variables are not set, the function will panic.
 ///
 /// # Example
@@ -294,16 +346,20 @@ pub fn build_pkg_config() {
 /// - `cargo:include=.../tdlib/include`
 /// - `cargo:rustc-link-lib=dylib=tdjson`
 /// - `cargo:rustc-link-arg=-Wl,-rpath,.../tdlib/lib`
-/// - `cargo:rustc-link-search=native=.../tdlib/bin` (only for Windows x86_64)
+/// - `cargo:rustc-link-search=native=.../tdlib/bin` (only for Windows)
+///
 /// The `...` represents the `dest_path` or the `OUT_DIR` environment variable.
 ///
 /// The function will download the tdlib library from the GitHub release page.
 /// Using the `download-tdlib` feature, no system dependencies are required.
 /// The OS and architecture currently supported are:
 /// - Linux x86_64
+/// - Linux aarch64
 /// - Windows x86_64
+/// - Windows aarch64
 /// - MacOS x86_64
 /// - MacOS aarch64
+///
 /// If the OS or architecture is not supported, the function will panic.
 ///
 /// # Example
@@ -352,13 +408,16 @@ pub fn build_download_tdlib(dest_path: Option<String>) {
 /// You can directly download the tdlib library from the [TDLib Release GitHub page](https://github.com/FedericoBruzzone/tdlib-rs/releases).
 ///
 /// The `LOCAL_TDLIB_PATH` environment variable must be set to the path of the tdlib folder.
+///
 /// The function will pass to the `rustc` the following flags:
 /// - `cargo:rustc-link-search=native=.../tdlib/lib`
 /// - `cargo:include=.../tdlib/include`
 /// - `cargo:rustc-link-lib=dylib=tdjson`
 /// - `cargo:rustc-link-arg=-Wl,-rpath,.../tdlib/lib`
-/// - `cargo:rustc-link-search=native=.../tdlib/bin` (only for Windows x86_64)
+/// - `cargo:rustc-link-search=native=.../tdlib/bin` (only for Windows)
+///
 /// The `...` represents the `LOCAL_TDLIB_PATH` environment variable.
+///
 /// If the `LOCAL_TDLIB_PATH` environment variable is not set, the function will panic.
 ///
 /// # Example
@@ -395,8 +454,8 @@ pub fn build_local_tdlib() {
 ///
 /// # Arguments
 /// - `dest_path`: The destination path where the tdlib library will be copied. If `None`, the path
-/// will be the `OUT_DIR` environment variable. This argument is used only when the
-/// `download-tdlib` feature is enabled.
+///   will be the `OUT_DIR` environment variable. This argument is used only when the
+///   `download-tdlib` feature is enabled.
 ///
 /// The function will check if the features are correctly set.
 /// The function will set the `rerun-if-changed` and `rerun-if-env-changed` flags for the build
@@ -424,6 +483,7 @@ pub fn build_local_tdlib() {
 pub fn build(_dest_path: Option<String>) {
     check_features();
     set_rerun_if();
+
     #[cfg(feature = "pkg-config")]
     build_pkg_config();
     #[cfg(feature = "download-tdlib")]

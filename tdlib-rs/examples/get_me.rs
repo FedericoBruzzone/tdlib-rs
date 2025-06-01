@@ -149,11 +149,24 @@ async fn main() {
     // Spawn a task to receive updates/responses
     let handle = tokio::spawn(async move {
         while run_flag_clone.load(Ordering::Acquire) {
-            if let Some((update, _client_id)) = tdlib_rs::receive() {
+            let result = tokio::task::spawn_blocking(tdlib_rs::receive)
+                .await
+                .unwrap();
+
+            if let Some((update, _client_id)) = result {
                 handle_update(update, &auth_tx).await;
+            } else {
+                tokio::time::sleep(std::time::Duration::from_millis(10)).await;
             }
         }
     });
+    // tokio::spawn(async move {
+    //     while run_flag_clone.load(Ordering::Acquire) {
+    //         if let Some((update, _client_id)) = tdlib_rs::receive() {
+    //             handle_update(update, &auth_tx).await;
+    //         }
+    //     }
+    // });
 
     // Set a fairly low verbosity level. We mainly do this because tdlib
     // requires to perform a random request with the client to start receiving
