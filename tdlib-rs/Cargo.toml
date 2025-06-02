@@ -17,8 +17,6 @@ readme = "README.md"
 [package.metadata.docs.rs]
 features = ["docs", "bots-only-api"]
 
-[package.metadata.system-deps]
-tdjson = "1.8.29"
 
 [features]
 # The default feature build the library using the local tdlib library

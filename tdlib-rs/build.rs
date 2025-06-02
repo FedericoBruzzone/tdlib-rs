@@ -235,12 +235,6 @@ fn main() -> std::io::Result<()> {
     // Prevent linking libraries to avoid documentation failure
     #[cfg(not(feature = "docs"))]
     {
-        // It requires the following variables to be set:
-        // - export PKG_CONFIG_PATH=$HOME/lib/tdlib/lib/pkgconfig/:$PKG_CONFIG_PATH
-        // - export LD_LIBRARY_PATH=$HOME/lib/tdlib/lib/:$LD_LIBRARY_PATH
-        #[cfg(feature = "pkg-config")]
-        system_deps::Config::new().probe().unwrap();
-
         #[cfg(feature = "download-tdlib")]
         download_tdlib();
 

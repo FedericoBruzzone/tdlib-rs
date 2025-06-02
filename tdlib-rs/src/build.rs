@@ -297,41 +297,6 @@ pub fn set_rerun_if() {
     println!("cargo:rerun-if-changed=build.rs");
 }
 
-#[cfg(any(feature = "pkg-config", feature = "docs"))]
-#[allow(clippy::needless_doctest_main)]
-/// Build the project using the `pkg-config` feature.
-/// Using the `pkg-config` feature, the function will probe the system dependencies.
-/// It means that the function assumes that the tdlib library is compiled in the system.
-/// It requires the following variables to be set:
-/// - `PKG_CONFIG_PATH=$HOME/lib/tdlib/lib/pkgconfig/:$PKG_CONFIG_PATH`
-/// - `LD_LIBRARY_PATH=$HOME/lib/tdlib/lib/:$LD_LIBRARY_PATH`
-///
-/// If the variables are not set, the function will panic.
-///
-/// # Example
-/// Cargo.toml:
-/// ```toml
-/// [dependencies]
-/// tdlib = { version = "...", features = ["pkg-config"] }
-/// ```
-///
-/// build.rs:
-/// ```rust
-/// fn main() {
-///   tdlib_rs::build::check_features();
-///   tdlib_rs::build::set_rerun_if();
-///   tdlib_rs::build::build_pkg_config();
-///   // Other build configurations
-///   // ...
-/// }
-/// ```
-pub fn build_pkg_config() {
-    #[cfg(not(feature = "docs"))]
-    {
-        system_deps::Config::new().probe().unwrap();
-    }
-}
-
 #[cfg(any(feature = "download-tdlib", feature = "docs"))]
 #[allow(clippy::needless_doctest_main)]
 #[allow(unused_variables)]
