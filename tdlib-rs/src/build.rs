@@ -445,7 +445,7 @@ pub fn build_local_tdlib() {
     {
         // copy_local_tdlib();
         let path = std::env::var("LOCAL_TDLIB_PATH").unwrap();
-        generic_build(Some(path), TDLIB_VERSION);
+        generic_build(Some(path));
     }
 }
 
