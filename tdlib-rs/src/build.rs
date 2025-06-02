@@ -4,9 +4,6 @@
 //! - `pkg-config`
 //! - `download-tdlib`
 
-#[allow(dead_code)]
-#[cfg(not(any(feature = "docs", feature = "pkg-config")))]
-const TDLIB_VERSION: &str = "1.8.29";
 #[cfg(feature = "download-tdlib")]
 const TDLIB_CARGO_PKG_VERSION: &str = "1.1.0";
 
@@ -62,11 +59,12 @@ fn copy_dir_all(
 /// If the OS or architecture is not supported, the function will panic.
 fn download_tdlib() {
     let base_url = "https://github.com/FedericoBruzzone/tdlib-rs/releases/download";
+    let tdlib_version = std::env::var("TDLIB_VERSION").unwrap();
     let url = format!(
         "{}/v{}/tdlib-{}-{}-{}.zip",
         base_url,
         TDLIB_CARGO_PKG_VERSION,
-        TDLIB_VERSION,
+        tdlib_version,
         std::env::var("CARGO_CFG_TARGET_OS").unwrap(),
         std::env::var("CARGO_CFG_TARGET_ARCH").unwrap(),
     );
@@ -161,20 +159,22 @@ fn generic_build(lib_path: Option<String>) {
     let prefix = correct_lib_path.to_string();
     let include_dir = format!("{}/include", prefix);
     let lib_dir = format!("{}/lib", prefix);
+    let tdlib_version = std::env::var("TDLIB_VERSION").unwrap();
+
     let mut_lib_path = {
         #[cfg(any(
             all(target_os = "linux", target_arch = "x86_64"),
             all(target_os = "linux", target_arch = "aarch64")
         ))]
         {
-            format!("{}/libtdjson.so.{}", lib_dir, TDLIB_VERSION)
+            format!("{}/libtdjson.so.{}", lib_dir, tdlib_version)
         }
         #[cfg(any(
             all(target_os = "macos", target_arch = "x86_64"),
             all(target_os = "macos", target_arch = "aarch64")
         ))]
         {
-            format!("{}/libtdjson.{}.dylib", lib_dir, TDLIB_VERSION)
+            format!("{}/libtdjson.{}.dylib", lib_dir, tdlib_version)
         }
         #[cfg(any(
             all(target_os = "windows", target_arch = "x86_64"),
@@ -295,41 +295,6 @@ pub fn set_rerun_if() {
     println!("cargo:rerun-if-env-changed=LOCAL_TDLIB_PATH");
 
     println!("cargo:rerun-if-changed=build.rs");
-}
-
-#[cfg(any(feature = "pkg-config", feature = "docs"))]
-#[allow(clippy::needless_doctest_main)]
-/// Build the project using the `pkg-config` feature.
-/// Using the `pkg-config` feature, the function will probe the system dependencies.
-/// It means that the function assumes that the tdlib library is compiled in the system.
-/// It requires the following variables to be set:
-/// - `PKG_CONFIG_PATH=$HOME/lib/tdlib/lib/pkgconfig/:$PKG_CONFIG_PATH`
-/// - `LD_LIBRARY_PATH=$HOME/lib/tdlib/lib/:$LD_LIBRARY_PATH`
-///
-/// If the variables are not set, the function will panic.
-///
-/// # Example
-/// Cargo.toml:
-/// ```toml
-/// [dependencies]
-/// tdlib = { version = "...", features = ["pkg-config"] }
-/// ```
-///
-/// build.rs:
-/// ```rust
-/// fn main() {
-///   tdlib_rs::build::check_features();
-///   tdlib_rs::build::set_rerun_if();
-///   tdlib_rs::build::build_pkg_config();
-///   // Other build configurations
-///   // ...
-/// }
-/// ```
-pub fn build_pkg_config() {
-    #[cfg(not(feature = "docs"))]
-    {
-        system_deps::Config::new().probe().unwrap();
-    }
 }
 
 #[cfg(any(feature = "download-tdlib", feature = "docs"))]

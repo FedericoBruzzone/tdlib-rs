@@ -15,11 +15,6 @@ use tdlib_rs_gen::generate_rust_code;
 use tdlib_rs_parser::parse_tl_file;
 use tdlib_rs_parser::tl::Definition;
 
-#[allow(dead_code)]
-#[cfg(not(any(feature = "docs", feature = "pkg-config")))]
-/// The version of the TDLib library.
-const TDLIB_VERSION: &str = "1.8.29";
-
 /// Load the type language definitions from a certain file.
 /// Parse errors will be printed to `stderr`, and only the
 /// valid results will be returned.
@@ -83,20 +78,22 @@ fn generic_build() {
     let prefix = format!("{}/tdlib", out_dir);
     let include_dir = format!("{}/include", prefix);
     let lib_dir = format!("{}/lib", prefix);
+    let tdlib_version = std::env::var("TDLIB_VERSION").unwrap();
+
     let lib_path = {
         #[cfg(any(
             all(target_os = "linux", target_arch = "x86_64"),
             all(target_os = "linux", target_arch = "aarch64")
         ))]
         {
-            format!("{}/libtdjson.so.{}", lib_dir, TDLIB_VERSION)
+            format!("{}/libtdjson.so.{}", lib_dir, tdlib_version)
         }
         #[cfg(any(
             all(target_os = "macos", target_arch = "x86_64"),
             all(target_os = "macos", target_arch = "aarch64")
         ))]
         {
-            format!("{}/libtdjson.{}.dylib", lib_dir, TDLIB_VERSION)
+            format!("{}/libtdjson.{}.dylib", lib_dir, tdlib_version)
         }
         #[cfg(any(
             all(target_os = "windows", target_arch = "x86_64"),
@@ -129,11 +126,13 @@ fn generic_build() {
 #[cfg(feature = "download-tdlib")]
 fn download_tdlib() {
     let base_url = "https://github.com/FedericoBruzzone/tdlib-rs/releases/download";
+    let tdlib_version = std::env::var("TDLIB_VERSION").unwrap();
+
     let url = format!(
         "{}/v{}/tdlib-{}-{}-{}.zip",
         base_url,
         env!("CARGO_PKG_VERSION"),
-        TDLIB_VERSION,
+        tdlib_version,
         std::env::var("CARGO_CFG_TARGET_OS").unwrap(),
         std::env::var("CARGO_CFG_TARGET_ARCH").unwrap(),
     );
@@ -236,12 +235,6 @@ fn main() -> std::io::Result<()> {
     // Prevent linking libraries to avoid documentation failure
     #[cfg(not(feature = "docs"))]
     {
-        // It requires the following variables to be set:
-        // - export PKG_CONFIG_PATH=$HOME/lib/tdlib/lib/pkgconfig/:$PKG_CONFIG_PATH
-        // - export LD_LIBRARY_PATH=$HOME/lib/tdlib/lib/:$LD_LIBRARY_PATH
-        #[cfg(feature = "pkg-config")]
-        system_deps::Config::new().probe().unwrap();
-
         #[cfg(feature = "download-tdlib")]
         download_tdlib();
 

@@ -15,6 +15,9 @@ extern "C" {
     fn td_create_client_id() -> c_int;
     fn td_send(client_id: c_int, request: *const c_char);
     fn td_receive(timeout: c_double) -> *const c_char;
+
+    // Deprecated.
+    fn td_set_log_verbosity_level(level: c_int);
 }
 
 pub(crate) fn create_client() -> i32 {
@@ -32,4 +35,9 @@ pub(crate) fn receive(timeout: f64) -> Option<String> {
             .as_ref()
             .map(|response| CStr::from_ptr(response).to_string_lossy().into_owned())
     }
+}
+
+// Deprecated.
+pub(crate) fn set_log_verbosity_level(level: i32) {
+    unsafe { td_set_log_verbosity_level(level) };
 }
