@@ -7,7 +7,7 @@
 #[allow(dead_code)]
 #[cfg(not(any(feature = "docs", feature = "pkg-config")))]
 /// The version of the TDLib library.
-const TDLIB_VERSION: &str = "1.8.29";
+const TDLIB_VERSION: &str = "1.8.31";
 #[cfg(feature = "download-tdlib")]
 const TDLIB_CARGO_PKG_VERSION: &str = "1.1.0";
 
@@ -145,7 +145,7 @@ fn download_tdlib() {
 /// If the tdlib library is not found at the specified path, the function will panic.
 ///
 /// The function will panic if the tdlib library is not found at the specified path.
-fn generic_build(lib_path: Option<String>, tdlib_version: String) {
+fn generic_build(lib_path: Option<String>) {
     let correct_lib_path: String;
     match lib_path {
         Some(lib_path) => {
@@ -168,14 +168,14 @@ fn generic_build(lib_path: Option<String>, tdlib_version: String) {
             all(target_os = "linux", target_arch = "aarch64")
         ))]
         {
-            format!("{}/libtdjson.so.{}", lib_dir, tdlib_version)
+            format!("{}/libtdjson.so.{}", lib_dir, TDLIB_VERSION)
         }
         #[cfg(any(
             all(target_os = "macos", target_arch = "x86_64"),
             all(target_os = "macos", target_arch = "aarch64")
         ))]
         {
-            format!("{}/libtdjson.{}.dylib", lib_dir, tdlib_version)
+            format!("{}/libtdjson.{}.dylib", lib_dir, TDLIB_VERSION)
         }
         #[cfg(any(
             all(target_os = "windows", target_arch = "x86_64"),
@@ -396,7 +396,7 @@ pub fn build_download_tdlib(dest_path: Option<String>) {
             )
             .unwrap();
         }
-        generic_build(dest_path, TDLIB_VERSION.to_string());
+        generic_build(dest_path);
     }
 }
 #[cfg(any(feature = "local-tdlib", feature = "docs"))]
@@ -440,12 +440,12 @@ pub fn build_download_tdlib(dest_path: Option<String>) {
 ///   // ...
 /// }
 /// ```
-pub fn build_local_tdlib(tdlib_version: String) {
+pub fn build_local_tdlib() {
     #[cfg(not(feature = "docs"))]
     {
         // copy_local_tdlib();
         let path = std::env::var("LOCAL_TDLIB_PATH").unwrap();
-        generic_build(Some(path), tdlib_version);
+        generic_build(Some(path), TDLIB_VERSION);
     }
 }
 
@@ -480,7 +480,7 @@ pub fn build_local_tdlib(tdlib_version: String) {
 ///   // ...
 /// }
 /// ```
-pub fn build(_dest_path: Option<String>, _tdlib_version: String) {
+pub fn build(_dest_path: Option<String>) {
     check_features();
     set_rerun_if();
 
@@ -489,5 +489,5 @@ pub fn build(_dest_path: Option<String>, _tdlib_version: String) {
     #[cfg(feature = "download-tdlib")]
     build_download_tdlib(_dest_path);
     #[cfg(feature = "local-tdlib")]
-    build_local_tdlib(_tdlib_version);
+    build_local_tdlib();
 }
