@@ -121,9 +121,26 @@ fn generic_build() {
     }
 
     println!("cargo:rustc-link-search=native={}", lib_dir);
-    println!("cargo:include={}", include_dir);
-    println!("cargo:rustc-link-lib=dylib=tdjson");
-    println!("cargo:rustc-link-arg=-Wl,-rpath,{}", lib_dir);
+
+    if cfg!(feature = "static-tdjson") {
+        println!("cargo:rustc-link-lib=stdc++");
+        println!("cargo:rustc-link-lib=static=c++");
+        println!("cargo:rustc-link-lib=static=z");
+        println!("cargo:rustc-link-lib=static=tdjson_private");
+        println!("cargo:rustc-link-lib=static=tdjson_static");
+        println!("cargo:rustc-link-lib=static=tdactor");
+        println!("cargo:rustc-link-lib=static=tdapi");
+        println!("cargo:rustc-link-lib=static=tdclient");
+        println!("cargo:rustc-link-lib=static=tdcore");
+        println!("cargo:rustc-link-lib=static=tddb");
+        println!("cargo:rustc-link-lib=static=tdnet");
+        println!("cargo:rustc-link-lib=static=tdsqlite");
+        println!("cargo:rustc-link-lib=static=tdutils");
+    } else {
+        println!("cargo:include={}", include_dir);
+        println!("cargo:rustc-link-lib=dylib=tdjson");
+        println!("cargo:rustc-link-arg=-Wl,-rpath,{}", lib_dir);
+    }
 }
 
 #[cfg(feature = "download-tdlib")]
