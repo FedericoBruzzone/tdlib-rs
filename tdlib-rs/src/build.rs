@@ -159,34 +159,34 @@ fn generic_build(lib_path: Option<String>) {
         }
     }
     let prefix = correct_lib_path.to_string();
-    let include_dir = format!("{}/include", prefix);
-    let lib_dir = format!("{}/lib", prefix);
+    let include_dir = format!("{prefix}/include");
+    let lib_dir = format!("{prefix}/lib");
     let mut_lib_path = {
         #[cfg(any(
             all(target_os = "linux", target_arch = "x86_64"),
             all(target_os = "linux", target_arch = "aarch64")
         ))]
         {
-            format!("{}/libtdjson.so.{}", lib_dir, TDLIB_VERSION)
+            format!("{lib_dir}/libtdjson.so.{TDLIB_VERSION}")
         }
         #[cfg(any(
             all(target_os = "macos", target_arch = "x86_64"),
             all(target_os = "macos", target_arch = "aarch64")
         ))]
         {
-            format!("{}/libtdjson.{}.dylib", lib_dir, TDLIB_VERSION)
+            format!("{lib_dir}/libtdjson.{TDLIB_VERSION}.dylib")
         }
         #[cfg(any(
             all(target_os = "windows", target_arch = "x86_64"),
             all(target_os = "windows", target_arch = "aarch64")
         ))]
         {
-            format!(r"{}\tdjson.lib", lib_dir)
+            format!(r"{lib_dir}\tdjson.lib")
         }
     };
 
     if !std::path::PathBuf::from(mut_lib_path.clone()).exists() {
-        panic!("tdjson shared library not found at {}", mut_lib_path);
+        panic!("tdjson shared library not found at {mut_lib_path}");
     }
 
     // This should be not necessary, but it is a workaround because windows does not find the
@@ -198,18 +198,18 @@ fn generic_build(lib_path: Option<String>) {
         all(target_os = "windows", target_arch = "aarch64")
     ))]
     {
-        let bin_dir = format!(r"{}\bin", prefix);
+        let bin_dir = format!(r"{prefix}\bin");
         let cargo_bin = format!("{}/.cargo/bin", dirs::home_dir().unwrap().to_str().unwrap());
 
-        let libcrypto3x64 = format!(r"{}\libcrypto-3-x64.dll", bin_dir);
-        let libssl3x64 = format!(r"{}\libssl-3-x64.dll", bin_dir);
-        let tdjson = format!(r"{}\tdjson.dll", bin_dir);
-        let zlib1 = format!(r"{}\zlib1.dll", bin_dir);
+        let libcrypto3x64 = format!(r"{bin_dir}\libcrypto-3-x64.dll");
+        let libssl3x64 = format!(r"{bin_dir}\libssl-3-x64.dll");
+        let tdjson = format!(r"{bin_dir}\tdjson.dll");
+        let zlib1 = format!(r"{bin_dir}\zlib1.dll");
 
-        let cargo_libcrypto3x64 = format!(r"{}\libcrypto-3-x64.dll", cargo_bin);
-        let cargo_libssl3x64 = format!(r"{}\libssl-3-x64.dll", cargo_bin);
-        let cargo_tdjson = format!(r"{}\tdjson.dll", cargo_bin);
-        let cargo_zlib1 = format!(r"{}\zlib1.dll", cargo_bin);
+        let cargo_libcrypto3x64 = format!(r"{cargo_bin}\libcrypto-3-x64.dll");
+        let cargo_libssl3x64 = format!(r"{cargo_bin}\libssl-3-x64.dll");
+        let cargo_tdjson = format!(r"{cargo_bin}\tdjson.dll");
+        let cargo_zlib1 = format!(r"{cargo_bin}\zlib1.dll");
 
         // Delete the files if they exist
         let _ = std::fs::remove_file(&cargo_libcrypto3x64);
@@ -229,14 +229,14 @@ fn generic_build(lib_path: Option<String>) {
         all(target_os = "windows", target_arch = "aarch64")
     ))]
     {
-        let bin_dir = format!(r"{}\bin", prefix);
-        println!("cargo:rustc-link-search=native={}", bin_dir);
+        let bin_dir = format!(r"{prefix}\bin");
+        println!("cargo:rustc-link-search=native={bin_dir}");
     }
 
-    println!("cargo:rustc-link-search=native={}", lib_dir);
-    println!("cargo:include={}", include_dir);
+    println!("cargo:rustc-link-search=native={lib_dir}");
+    println!("cargo:include={include_dir}");
     println!("cargo:rustc-link-lib=dylib=tdjson");
-    println!("cargo:rustc-link-arg=-Wl,-rpath,{}", lib_dir);
+    println!("cargo:rustc-link-arg=-Wl,-rpath,{lib_dir}");
 }
 
 /// Check if the features are correctly set.

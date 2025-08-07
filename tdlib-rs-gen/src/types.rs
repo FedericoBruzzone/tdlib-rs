@@ -68,7 +68,7 @@ fn write_struct<W: Write>(
         )?;
 
         if let Some(serde_as) = rustifier::parameters::serde_as(param) {
-            writeln!(file, "        #[serde_as(as = \"{}\")]", serde_as)?;
+            writeln!(file, "        #[serde_as(as = \"{serde_as}\")]")?;
         }
         write!(
             file,

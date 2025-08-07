@@ -31,7 +31,7 @@ fn load_tl(file: &str) -> std::io::Result<Vec<Definition>> {
         .filter_map(|d| match d {
             Ok(d) => Some(d),
             Err(e) => {
-                eprintln!("TL: parse error: {:?}", e);
+                eprintln!("TL: parse error: {e:?}");
                 None
             }
         })
@@ -60,7 +60,7 @@ fn copy_local_tdlib() {
     match env::var("LOCAL_TDLIB_PATH") {
         Ok(tdlib_path) => {
             let out_dir = env::var("OUT_DIR").unwrap();
-            let prefix = format!("{}/tdlib", out_dir);
+            let prefix = format!("{out_dir}/tdlib");
             copy_dir_all(Path::new(&tdlib_path), Path::new(&prefix)).unwrap();
         }
         Err(_) => {
@@ -80,35 +80,35 @@ fn copy_local_tdlib() {
 /// - MacOS aarch64
 fn generic_build() {
     let out_dir = env::var("OUT_DIR").unwrap();
-    let prefix = format!("{}/tdlib", out_dir);
-    let include_dir = format!("{}/include", prefix);
-    let lib_dir = format!("{}/lib", prefix);
+    let prefix = format!("{out_dir}/tdlib");
+    let include_dir = format!("{prefix}/include");
+    let lib_dir = format!("{prefix}/lib");
     let lib_path = {
         #[cfg(any(
             all(target_os = "linux", target_arch = "x86_64"),
             all(target_os = "linux", target_arch = "aarch64")
         ))]
         {
-            format!("{}/libtdjson.so.{}", lib_dir, TDLIB_VERSION)
+            format!("{lib_dir}/libtdjson.so.{TDLIB_VERSION}")
         }
         #[cfg(any(
             all(target_os = "macos", target_arch = "x86_64"),
             all(target_os = "macos", target_arch = "aarch64")
         ))]
         {
-            format!("{}/libtdjson.{}.dylib", lib_dir, TDLIB_VERSION)
+            format!("{lib_dir}/libtdjson.{TDLIB_VERSION}.dylib")
         }
         #[cfg(any(
             all(target_os = "windows", target_arch = "x86_64"),
             all(target_os = "windows", target_arch = "aarch64")
         ))]
         {
-            format!(r"{}\tdjson.lib", lib_dir)
+            format!(r"{lib_dir}\tdjson.lib")
         }
     };
 
     if !std::path::PathBuf::from(lib_path.clone()).exists() {
-        panic!("tdjson shared library not found at {}", lib_path);
+        panic!("tdjson shared library not found at {lib_path}");
     }
 
     #[cfg(any(
@@ -116,14 +116,14 @@ fn generic_build() {
         all(target_os = "windows", target_arch = "aarch64")
     ))]
     {
-        let bin_dir = format!(r"{}\bin", prefix);
-        println!("cargo:rustc-link-search=native={}", bin_dir);
+        let bin_dir = format!(r"{prefix}\bin");
+        println!("cargo:rustc-link-search=native={bin_dir}");
     }
 
-    println!("cargo:rustc-link-search=native={}", lib_dir);
-    println!("cargo:include={}", include_dir);
+    println!("cargo:rustc-link-search=native={lib_dir}");
+    println!("cargo:include={include_dir}");
     println!("cargo:rustc-link-lib=dylib=tdjson");
-    println!("cargo:rustc-link-arg=-Wl,-rpath,{}", lib_dir);
+    println!("cargo:rustc-link-arg=-Wl,-rpath,{lib_dir}");
 }
 
 #[cfg(feature = "download-tdlib")]

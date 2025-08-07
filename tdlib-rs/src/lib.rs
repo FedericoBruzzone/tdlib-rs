@@ -48,11 +48,7 @@ pub fn receive() -> Option<(Update, i32)> {
                         return Some((update, client_id));
                     }
                     Err(e) => {
-                        log::warn!(
-                            "Received an unknown response: {}\nReason: {}",
-                            response_str,
-                            e
-                        );
+                        log::warn!("Received an unknown response: {response_str}\nReason: {e}");
                     }
                 }
             }

@@ -40,7 +40,7 @@ impl fmt::Display for Definition {
         write!(f, "{}", self.name)?;
 
         for param in self.params.iter() {
-            write!(f, " {}", param)?;
+            write!(f, " {param}")?;
         }
         write!(f, " = {}", self.ty)?;
         Ok(())

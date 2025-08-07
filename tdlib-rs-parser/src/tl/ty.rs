@@ -29,7 +29,7 @@ impl fmt::Display for Type {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.name)?;
         if let Some(generic_arg) = &self.generic_arg {
-            write!(f, "<{}>", generic_arg)?;
+            write!(f, "<{generic_arg}>")?;
         }
         Ok(())
     }
