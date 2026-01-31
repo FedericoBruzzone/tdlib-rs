@@ -8,6 +8,7 @@
 [![CI Linux](https://github.com/FedericoBruzzone/tdlib-rs/actions/workflows/ci-linux.yml/badge.svg)](https://github.com/FedericoBruzzone/tdlib-rs/actions/workflows/ci-linux.yml)
 [![CI Windows](https://github.com/FedericoBruzzone/tdlib-rs/actions/workflows/ci-windows.yml/badge.svg)](https://github.com/FedericoBruzzone/tdlib-rs/actions/workflows/ci-windows.yml)
 [![CI macOS](https://github.com/FedericoBruzzone/tdlib-rs/actions/workflows/ci-macos.yml/badge.svg)](https://github.com/FedericoBruzzone/tdlib-rs/actions/workflows/ci-macos.yml)
+[![CD](https://github.com/FedericoBruzzone/tdlib-rs/actions/workflows/cd.yml/badge.svg)](https://github.com/FedericoBruzzone/tdlib-rs/actions/workflows/cd.yml)
 [![downloads](https://img.shields.io/crates/d/tdlib_rs)](https://crates.io/crates/tdlib_rs)
 ![license](https://img.shields.io/crates/l/tdlib_rs)
 
