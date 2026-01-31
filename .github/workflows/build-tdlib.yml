@@ -137,7 +137,7 @@ jobs:
                   rm -rf build
                   mkdir build
                   cd build
-                  cmake -A "$CMAKE_ARCH" -DCMAKE_INSTALL_PREFIX:PATH=../tdlib -DCMAKE_TOOLCHAIN_FILE:FILEPATH=../vcpkg/scripts/buildsystems/vcpkg.cmake ..
+                  cmake -A "$CMAKE_ARCH" -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_INSTALL_PREFIX:PATH=../tdlib -DCMAKE_TOOLCHAIN_FILE:FILEPATH=../vcpkg/scripts/buildsystems/vcpkg.cmake ..
                   cmake --build . --target install --config Release
               shell: bash
             - name: Save cache TDLib
