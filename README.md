@@ -17,11 +17,10 @@ A Rust wrapper around the Telegram Database library. It includes a generator to 
 
 This is an improved version of the [tdlib-rs](https://github.com/paper-plane-developers/tdlib-rs) library, with the following additional features:
 
-
 1. It is cross-platform, it works on Windows, Linux and MacOS.
 2. Not required `tdlib` to be compiled and installed on the system.
 3. Not required `pkg-config` to build the library and associated exported variables.
-2. Three different ways to build the library:
+4. Three different ways to build the library:
     - `download-tdlib`: download the precompiled library from the GitHub releases.
     - `local-tdlib`: use the `tdlib` installed on the system.
     - `pkg-config`: use the `pkg-config` to build the library.
@@ -32,9 +31,10 @@ This is an improved version of the [tdlib-rs](https://github.com/paper-plane-dev
 We provide a precompiled version of the library for the supported platforms:
 
 - Linux (x86_64)
-- Windows (x86_64)
 - macOS Intel (x86_64)
 - macOS Apple Silicon (arm64)
+- Windows (x86_64)
+- Windows (arm64)
 
 We compile it in the CI and we upload the artifacts to the GitHub releases, so we can download it and use to build this library.
 
@@ -146,8 +146,9 @@ Please review the license file provided in the repository for more information r
 If you have any questions, suggestions, or feedback, do not hesitate to [contact me](https://federicobruzzone.github.io/).
 
 Mantainers:
-  - [FedericoBruzzone](https://github.com/FedericoBruzzone)
-  - [Andreal2000](https://github.com/Andreal2000)
+
+- [FedericoBruzzone](https://github.com/FedericoBruzzone)
+- [Andreal2000](https://github.com/Andreal2000)
 
 ## Credits
 
