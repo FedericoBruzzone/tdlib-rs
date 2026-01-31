@@ -385,10 +385,9 @@ pub fn build_download_tdlib(dest_path: Option<String>) {
     #[cfg(not(feature = "docs"))]
     {
         download_tdlib();
-        if dest_path.is_some() {
+        if let Some(dest_path) = &dest_path {
             let out_dir = std::env::var("OUT_DIR").unwrap();
             let tdlib_dir = format!("{}/tdlib", &out_dir);
-            let dest_path = dest_path.as_ref().unwrap();
             copy_dir_all(
                 std::path::Path::new(&tdlib_dir),
                 std::path::Path::new(&dest_path),
