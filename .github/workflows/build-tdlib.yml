@@ -1,148 +1,154 @@
 name: Build TDLib
 
 on:
-  workflow_dispatch:
-  workflow_call:
+    workflow_dispatch:
+    workflow_call:
 
 env:
     TDLIB_VERSION: "1.8.29"
     TDLIB_COMMIT: af69dd4397b6dc1bf23ba0fd0bf429fcba6454f6
 
 jobs:
-  build-linux:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: ubuntu-latest
-          - os: ubuntu-24.04-arm
-    runs-on: ${{ matrix.os }}
-    steps:
-      - name: Restore cache TDLib
-        id: cache-tdlib-restore
-        uses: actions/cache/restore@v4
-        with:
-          path: td/
-          key: tdlib-${{ env.TDLIB_VERSION }}-linux-${{ runner.arch == 'ARM64' && 'aarch64' || 'x86_64' }}
-      - name: Build TDLib
-        if: steps.cache-tdlib-restore.outputs.cache-hit != 'true'
-        run: |
-          sudo apt-get update
-          sudo apt-get -y upgrade
-          sudo apt-get install make git zlib1g-dev libssl-dev gperf php-cli cmake clang-18 libc++-18-dev libc++abi-18-dev
-          git clone https://github.com/tdlib/td.git
-          cd td
-          git checkout $TDLIB_COMMIT
-          rm -rf build
-          mkdir build
-          cd build
-          CXXFLAGS="-stdlib=libc++" CC=/usr/bin/clang-18 CXX=/usr/bin/clang++-18 cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX:PATH=../tdlib ..
-          cmake --build . --target install
-      - name: Save cache TDLib
-        uses: actions/cache/save@v4
-        if: steps.cache-tdlib-restore.outputs.cache-hit != 'true'
-        with:
-          path: td/
-          key: ${{ steps.cache-tdlib-restore.outputs.cache-primary-key }}
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ steps.cache-tdlib-restore.outputs.cache-primary-key }}
-          path: ./td/tdlib/
-          overwrite: true
+    build-linux:
+        strategy:
+            fail-fast: false
+            matrix:
+                include:
+                    - os: ubuntu-latest
+                    - os: ubuntu-24.04-arm
+        runs-on: ${{ matrix.os }}
+        steps:
+            - name: Restore cache TDLib
+              id: cache-tdlib-restore
+              uses: actions/cache/restore@v4
+              with:
+                  path: td/
+                  key: tdlib-${{ env.TDLIB_VERSION }}-linux-${{ runner.arch == 'ARM64' && 'aarch64' || 'x86_64' }}
+            - name: Build TDLib
+              if: steps.cache-tdlib-restore.outputs.cache-hit != 'true'
+              run: |
+                  sudo apt-get update
+                  sudo apt-get -y upgrade
+                  sudo apt-get install make git zlib1g-dev libssl-dev gperf php-cli cmake clang-18 libc++-18-dev libc++abi-18-dev
+                  git clone https://github.com/tdlib/td.git
+                  cd td
+                  git checkout $TDLIB_COMMIT
+                  rm -rf build
+                  mkdir build
+                  cd build
+                  CXXFLAGS="-stdlib=libc++" CC=/usr/bin/clang-18 CXX=/usr/bin/clang++-18 cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX:PATH=../tdlib ..
+                  cmake --build . --target install
+            - name: Save cache TDLib
+              uses: actions/cache/save@v4
+              if: steps.cache-tdlib-restore.outputs.cache-hit != 'true'
+              with:
+                  path: td/
+                  key: ${{ steps.cache-tdlib-restore.outputs.cache-primary-key }}
+            - name: Upload artifact
+              uses: actions/upload-artifact@v4
+              with:
+                  name: ${{ steps.cache-tdlib-restore.outputs.cache-primary-key }}
+                  path: ./td/tdlib/
+                  overwrite: true
 
-  build-macos:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos-14 # arm64 (M1)
-          - os: macos-15-intel # Intel # macos-13
-    runs-on: ${{ matrix.os }}
-    steps:
-      - name: Restore cache TDLib
-        id: cache-tdlib-restore
-        uses: actions/cache/restore@v4
-        with:
-          path: td/
-          key: tdlib-${{ env.TDLIB_VERSION }}-macos-${{ runner.arch == 'ARM64' && 'aarch64' || 'x86_64' }}
-      - name: Build TDLib
-        if: steps.cache-tdlib-restore.outputs.cache-hit != 'true'
-        run: |
-          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-          brew install gperf openssl
-          git clone https://github.com/tdlib/td.git
-          cd td
-          git checkout $TDLIB_COMMIT
-          rm -rf build
-          mkdir build
-          cd build
-          cmake -DCMAKE_BUILD_TYPE=Release -DOPENSSL_ROOT_DIR=${{ runner.arch == 'ARM64' && '/opt/homebrew/opt/openssl/' || '/usr/local/opt/openssl/' }} -DCMAKE_INSTALL_PREFIX:PATH=../tdlib ..
-          cmake --build . --target install
-      - name: Save cache TDLib
-        uses: actions/cache/save@v4
-        if: steps.cache-tdlib-restore.outputs.cache-hit != 'true'
-        with:
-          path: td/
-          key: ${{ steps.cache-tdlib-restore.outputs.cache-primary-key }}
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ steps.cache-tdlib-restore.outputs.cache-primary-key }}
-          path: ./td/tdlib/
-          overwrite: true
+    build-macos:
+        strategy:
+            fail-fast: false
+            matrix:
+                include:
+                    - os: macos-14 # arm64 (M1)
+                    - os: macos-15-intel # Intel # macos-13
+        runs-on: ${{ matrix.os }}
+        steps:
+            - name: Restore cache TDLib
+              id: cache-tdlib-restore
+              uses: actions/cache/restore@v4
+              with:
+                  path: td/
+                  key: tdlib-${{ env.TDLIB_VERSION }}-macos-${{ runner.arch == 'ARM64' && 'aarch64' || 'x86_64' }}
+            - name: Build TDLib
+              if: steps.cache-tdlib-restore.outputs.cache-hit != 'true'
+              run: |
+                  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+                  brew install gperf openssl
+                  git clone https://github.com/tdlib/td.git
+                  cd td
+                  git checkout $TDLIB_COMMIT
+                  rm -rf build
+                  mkdir build
+                  cd build
+                  cmake \
+                    -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+                    -DCMAKE_BUILD_TYPE=Release \
+                    -DOPENSSL_ROOT_DIR=${{ runner.arch == 'ARM64' && '/opt/homebrew/opt/openssl/' || '/usr/local/opt/openssl/' }} \
+                    -DCMAKE_INSTALL_PREFIX:PATH=../tdlib \
+                    ..
+                  cmake --build . --target install
+            - name: Save cache TDLib
+              uses: actions/cache/save@v4
+              if: steps.cache-tdlib-restore.outputs.cache-hit != 'true'
+              with:
+                  path: td/
+                  key: ${{ steps.cache-tdlib-restore.outputs.cache-primary-key }}
+            - name: Upload artifact
+              uses: actions/upload-artifact@v4
+              with:
+                  name: ${{ steps.cache-tdlib-restore.outputs.cache-primary-key }}
+                  path: ./td/tdlib/
+                  overwrite: true
 
-  build-windows:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: windows-latest
-          - os: windows-11-arm
-    runs-on: ${{ matrix.os }}
-    steps:
-      - name: Restore cache TDLib
-        id: cache-tdlib-restore
-        uses: actions/cache/restore@v4
-        with:
-          path: td/
-          key: tdlib-${{ env.TDLIB_VERSION }}-windows-${{ runner.arch == 'ARM64' && 'aarch64' || 'x86_64' }}
-      - name: Build TDLib
-        if: steps.cache-tdlib-restore.outputs.cache-hit != 'true'
-        run: |
-          git clone https://github.com/tdlib/td.git
-          cd td
-          git checkout $TDLIB_COMMIT
-          git clone https://github.com/Microsoft/vcpkg.git
-          cd vcpkg
-          git checkout 07b30b49e5136a36100a2ce644476e60d7f3ddc1
-          ./bootstrap-vcpkg.bat
-          if [[ "$RUNNER_ARCH" == "X64" ]]; then
-            ./vcpkg.exe install gperf:x64-windows openssl:x64-windows zlib:x64-windows
-            CMAKE_ARCH="x64"
-          elif [[ "$RUNNER_ARCH" == "ARM64" ]]; then
-            ./vcpkg.exe install gperf:arm64-windows openssl:arm64-windows zlib:arm64-windows
-            CMAKE_ARCH="ARM64"
-          else
-            echo "Unsupported architecture: $RUNNER_ARCH"
-            exit 1
-          fi
-          cd ..
-          rm -rf build
-          mkdir build
-          cd build
-          cmake -A "$CMAKE_ARCH" -DCMAKE_INSTALL_PREFIX:PATH=../tdlib -DCMAKE_TOOLCHAIN_FILE:FILEPATH=../vcpkg/scripts/buildsystems/vcpkg.cmake ..
-          cmake --build . --target install --config Release
-        shell: bash
-      - name: Save cache TDLib
-        uses: actions/cache/save@v4
-        if: steps.cache-tdlib-restore.outputs.cache-hit != 'true'
-        with:
-          path: td/
-          key: ${{ steps.cache-tdlib-restore.outputs.cache-primary-key }}
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ steps.cache-tdlib-restore.outputs.cache-primary-key }}
-          path: ./td/tdlib/
-          overwrite: true
+    build-windows:
+        strategy:
+            fail-fast: false
+            matrix:
+                include:
+                    - os: windows-latest
+                    - os: windows-11-arm
+        runs-on: ${{ matrix.os }}
+        steps:
+            - name: Restore cache TDLib
+              id: cache-tdlib-restore
+              uses: actions/cache/restore@v4
+              with:
+                  path: td/
+                  key: tdlib-${{ env.TDLIB_VERSION }}-windows-${{ runner.arch == 'ARM64' && 'aarch64' || 'x86_64' }}
+            - name: Build TDLib
+              if: steps.cache-tdlib-restore.outputs.cache-hit != 'true'
+              run: |
+                  git clone https://github.com/tdlib/td.git
+                  cd td
+                  git checkout $TDLIB_COMMIT
+                  git clone https://github.com/Microsoft/vcpkg.git
+                  cd vcpkg
+                  if [[ "$RUNNER_ARCH" == "X64" ]]; then
+                    git checkout 07b30b49e5136a36100a2ce644476e60d7f3ddc1
+                    ./bootstrap-vcpkg.bat
+                    ./vcpkg.exe install gperf:x64-windows openssl:x64-windows zlib:x64-windows
+                    CMAKE_ARCH="x64"
+                  elif [[ "$RUNNER_ARCH" == "ARM64" ]]; then
+                    ./bootstrap-vcpkg.bat
+                    ./vcpkg.exe install gperf:arm64-windows openssl:arm64-windows zlib:arm64-windows
+                    CMAKE_ARCH="ARM64"
+                  else
+                    echo "Unsupported architecture: $RUNNER_ARCH"
+                    exit 1
+                  fi
+                  cd ..
+                  rm -rf build
+                  mkdir build
+                  cd build
+                  cmake -A "$CMAKE_ARCH" -DCMAKE_INSTALL_PREFIX:PATH=../tdlib -DCMAKE_TOOLCHAIN_FILE:FILEPATH=../vcpkg/scripts/buildsystems/vcpkg.cmake ..
+                  cmake --build . --target install --config Release
+              shell: bash
+            - name: Save cache TDLib
+              uses: actions/cache/save@v4
+              if: steps.cache-tdlib-restore.outputs.cache-hit != 'true'
+              with:
+                  path: td/
+                  key: ${{ steps.cache-tdlib-restore.outputs.cache-primary-key }}
+            - name: Upload artifact
+              uses: actions/upload-artifact@v4
+              with:
+                  name: ${{ steps.cache-tdlib-restore.outputs.cache-primary-key }}
+                  path: ./td/tdlib/
+                  overwrite: true
