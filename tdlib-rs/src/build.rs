@@ -8,7 +8,7 @@
 #[cfg(not(any(feature = "docs", feature = "pkg-config")))]
 const TDLIB_VERSION: &str = "1.8.29";
 #[cfg(feature = "download-tdlib")]
-const TDLIB_CARGO_PKG_VERSION: &str = "1.1.0";
+const TDLIB_CARGO_PKG_VERSION: &str = "1.2.0";
 
 // WARNING: This function is not used in the current version of the library.
 // #[cfg(not(any(feature = "docs", feature = "pkg-config", feature = "download-tdlib")))]

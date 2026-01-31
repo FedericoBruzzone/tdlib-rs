@@ -31,6 +31,7 @@ This is an improved version of the [tdlib-rs](https://github.com/paper-plane-dev
 We provide a precompiled version of the library for the supported platforms:
 
 - Linux (x86_64)
+- Linux (arm64)
 - macOS Intel (x86_64)
 - macOS Apple Silicon (arm64)
 - Windows (x86_64)
