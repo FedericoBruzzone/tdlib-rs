@@ -1,14 +1,11 @@
 [package]
 name = "tdlib-rs"
-version = "1.2.0"
-authors = [
-    "Federico Bruzzone <federico.bruzzone.i@gmail.com>",
-    "Andrea Longoni",
-]
-edition = "2021"
-license = "MIT OR Apache-2.0"
-homepage = "https://github.com/FedericoBruzzone/tdlib-rs"
-repository = "https://github.com/FedericoBruzzone/tdlib-rs"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+homepage.workspace = true
+repository.workspace = true
 documentation = "https://docs.rs/tdlib-rs"
 keywords = ["telegram", "tdlib", "tdjson", "tdlib-rs", "telegram-api"]
 description = "Rust wrapper around the Telegram Database Library."
@@ -47,8 +44,8 @@ zip = { version = "2.0.0", optional = true }
 dirs = "6.0.0"
 
 [build-dependencies]
-tdlib-rs-gen = { path = "../tdlib-rs-gen", version = "1.2.0" }
-tdlib-rs-parser = { path = "../tdlib-rs-parser", version = "1.2.0" }
+tdlib-rs-gen = { workspace = true }
+tdlib-rs-parser = { workspace = true }
 system-deps = { version = "7", optional = true }
 reqwest = { version = "0.12.4", features = ["blocking"], optional = true }
 zip = { version = "2.0.0", optional = true }

@@ -5,3 +5,18 @@ members = [
   "tdlib-rs-parser",
 ]
 resolver = "2"
+
+[workspace.package]
+version = "1.2.0"
+edition = "2021"
+authors = [
+    "Federico Bruzzone <federico.bruzzone.i@gmail.com>",
+    "Andrea Longoni",
+]
+license = "MIT OR Apache-2.0"
+homepage = "https://github.com/FedericoBruzzone/tdlib-rs"
+repository = "https://github.com/FedericoBruzzone/tdlib-rs"
+
+[workspace.dependencies]
+tdlib-rs-gen = { path = "tdlib-rs-gen" }
+tdlib-rs-parser = { path = "tdlib-rs-parser" }
