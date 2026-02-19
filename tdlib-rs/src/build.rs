@@ -6,7 +6,7 @@
 
 #[allow(dead_code)]
 #[cfg(not(any(feature = "docs", feature = "pkg-config")))]
-const TDLIB_VERSION: &str = "1.8.29";
+const TDLIB_VERSION: &str = "1.8.61";
 #[cfg(feature = "download-tdlib")]
 const TDLIB_CARGO_PKG_VERSION: &str = "1.2.0";
 
