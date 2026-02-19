@@ -226,16 +226,16 @@ pub mod types {
             return Some("DisplayFromStr".into());
         }
 
-        if let Some(generic_arg) = &ty.generic_arg {
-            if let Some(serde_as) = serde_as(generic_arg) {
-                let mut result = get_base_path(ty);
+        if let Some(generic_arg) = &ty.generic_arg
+            && let Some(serde_as) = serde_as(generic_arg)
+        {
+            let mut result = get_base_path(ty);
 
-                result.push('<');
-                result.push_str(&serde_as);
-                result.push('>');
+            result.push('<');
+            result.push_str(&serde_as);
+            result.push('>');
 
-                return Some(result);
-            }
+            return Some(result);
         }
 
         None

@@ -50,10 +50,10 @@ impl Iterator for TlIterator {
                 loop {
                     if let Some((i, c)) = chars.next() {
                         if !in_comment && c == '/' {
-                            if let Some((_, pc)) = chars.peek() {
-                                if *pc == '/' {
-                                    in_comment = true;
-                                }
+                            if let Some((_, pc)) = chars.peek()
+                                && *pc == '/'
+                            {
+                                in_comment = true;
                             }
                         } else if in_comment && c == '\n' {
                             in_comment = false;

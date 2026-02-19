@@ -112,10 +112,10 @@ fn def_contains_only_bare_types<'a>(
             return false;
         }
 
-        if let Some(def) = definition_map.get(&param.ty.name) {
-            if !def_contains_only_bare_types(def, definition_map) {
-                return false;
-            }
+        if let Some(def) = definition_map.get(&param.ty.name)
+            && !def_contains_only_bare_types(def, definition_map)
+        {
+            return false;
         }
     }
 

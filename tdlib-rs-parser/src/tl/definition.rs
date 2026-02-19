@@ -70,10 +70,10 @@ impl FromStr for Definition {
             let mut docs = HashMap::new();
             let mut comments_end = 0;
 
-            if let Some(start) = definition.rfind("//") {
-                if let Some(end) = definition[start..].find('\n') {
-                    comments_end = start + end;
-                }
+            if let Some(start) = definition.rfind("//")
+                && let Some(end) = definition[start..].find('\n')
+            {
+                comments_end = start + end;
             }
 
             let mut offset = 0;
