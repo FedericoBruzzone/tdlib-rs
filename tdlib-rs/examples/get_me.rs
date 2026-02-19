@@ -3,8 +3,8 @@
 // cargo run -p tdlib-rs --example get_me --features pkg-config
 
 use std::sync::{
-    atomic::{AtomicBool, Ordering},
     Arc,
+    atomic::{AtomicBool, Ordering},
 };
 use tdlib_rs::{
     enums::{self, AuthorizationState, Update, User},

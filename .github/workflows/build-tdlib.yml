@@ -6,7 +6,7 @@ on:
 
 env:
     TDLIB_VERSION: "1.8.61"
-    TDLIB_COMMIT: 11e254af695060d8890024dd7faa1cc2d6685ef8
+    TDLIB_COMMIT: 6d509061574d684117f74133056aa43df89022fc
 
 jobs:
     build-linux:
@@ -121,7 +121,7 @@ jobs:
                   git clone https://github.com/Microsoft/vcpkg.git
                   cd vcpkg
                   if [[ "$RUNNER_ARCH" == "X64" ]]; then
-                    git checkout 07b30b49e5136a36100a2ce644476e60d7f3ddc1
+                    git checkout bc3512a509f9d29b37346a7e7e929f9a26e66c7e
                     ./bootstrap-vcpkg.bat
                     ./vcpkg.exe install gperf:x64-windows openssl:x64-windows zlib:x64-windows
                     CMAKE_ARCH="x64"

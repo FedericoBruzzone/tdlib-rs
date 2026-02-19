@@ -105,10 +105,10 @@ fn download_tdlib() {
         if (*file.name()).ends_with('/') {
             std::fs::create_dir_all(&outpath).unwrap();
         } else {
-            if let Some(p) = outpath.parent() {
-                if !p.exists() {
-                    std::fs::create_dir_all(p).unwrap();
-                }
+            if let Some(p) = outpath.parent()
+                && !p.exists()
+            {
+                std::fs::create_dir_all(p).unwrap();
             }
             let mut outfile = std::fs::File::create(&outpath).unwrap();
             std::io::copy(&mut file, &mut outfile).unwrap();
