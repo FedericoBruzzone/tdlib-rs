@@ -11,7 +11,7 @@ use std::ffi::{CStr, CString};
 use std::os::raw::{c_char, c_double, c_int};
 
 #[link(name = "tdjson")]
-extern "C" {
+unsafe extern "C" {
     fn td_create_client_id() -> c_int;
     fn td_send(client_id: c_int, request: *const c_char);
     fn td_receive(timeout: c_double) -> *const c_char;
