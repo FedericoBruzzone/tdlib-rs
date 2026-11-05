@@ -87,9 +87,13 @@ fn download_tdlib() {
 
     for i in 0..archive.len() {
         let mut file = archive.by_index(i).unwrap();
-        let outpath = std::path::Path::new(&out_dir).join(file.name());
+        // zip 9: `name()` returns a result and is not a safe extract path.
+        let outpath = std::path::Path::new(&out_dir).join(
+            file.enclosed_name()
+                .expect("TDLib archive contains an invalid entry path"),
+        );
 
-        if (*file.name()).ends_with('/') {
+        if file.is_dir() {
             std::fs::create_dir_all(&outpath).unwrap();
         } else {
             if let Some(p) = outpath.parent()

@@ -42,7 +42,7 @@ serde_json = "1"
 serde_with = "3"
 system-deps = { version = "7", optional = true }
 ureq = { version = "3", optional = true }
-zip = { version = "8", optional = true }
+zip = { version = "9.0.5", optional = true }
 dirs = "6"
 
 [build-dependencies]
@@ -50,7 +50,7 @@ tdlib-rs-gen = { workspace = true }
 tdlib-rs-parser = { workspace = true }
 system-deps = { version = "7", optional = true }
 ureq = { version = "3", optional = true }
-zip = { version = "8", optional = true }
+zip = { version = "9.0.5", optional = true }
 
 [dev-dependencies]
 tokio = { version = "1", features = ["macros", "rt-multi-thread", "sync", "time"] }
